@@ -115,8 +115,6 @@
     <div class="list" id="list"></div>
 
     <div class="add-box" id="postBox" style="display:none;">
-      <label for="postName">Pangalan / Username</label>
-      <input type="text" id="postName" placeholder="Ilagay ang iyong pangalan">
       <label for="newMsg">Mensahe</label>
       <textarea id="newMsg" placeholder="Isulat dito ang iyong post..."></textarea>
       <div class="row">
@@ -319,12 +317,10 @@
 
   document.getElementById('addBtn').addEventListener('click', async () => {
     if(!isAdmin){ alert('Admin lang ang makakapag-post sa forum na ito.'); return; }
-    const nameInput = document.getElementById('postName');
     const textarea = document.getElementById('newMsg');
-    const author = nameInput.value.trim() || 'Anonymous';
+    const author = 'Admin';
     const text = textarea.value.trim();
 
-    if(bannedSet.has(normName(author))){ alert('Naka-kick ka ng admin — hindi ka na makakapag-post.'); return; }
     if(text.length === 0) return;
 
     try{
