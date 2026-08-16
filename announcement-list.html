@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mga Announcement</title>
+<title>HOT VPN — Forum & GC</title>
 <style>
   *{box-sizing:border-box;}
   body{
@@ -13,212 +13,217 @@
     font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     padding:30px 16px;
   }
-  .wrap{
-    max-width:520px;
-    margin:0 auto;
-  }
-  h1{
-    color:#e8e9ec;
-    font-size:1.3rem;
-    margin:0 0 18px;
+  .wrap{ max-width:520px; margin:0 auto; }
+  h1{ color:#e8e9ec; font-size:1.3rem; margin:0 0 4px; text-align:center; }
+  .subtitle{ color:#8b93a3; font-size:0.8rem; text-align:center; margin:0 0 14px; }
+  .admin-status{
     text-align:center;
-  }
-  .list{
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-  }
-  .card{
-    background:#262b36;
-    border:1px solid #333a48;
-    border-radius:12px;
-    padding:20px;
-    box-shadow:0 6px 18px rgba(0,0,0,0.3);
-  }
-  .card .icon{
-    font-size:1.3rem;
-    margin-bottom:10px;
-  }
-  .card .message{
-    color:#e8e9ec;
-    font-size:1rem;
-    line-height:1.6;
-    margin:0 0 10px;
-    white-space:pre-wrap;
-  }
-  .card .timestamp{
-    color:#8b93a3;
-    font-size:0.75rem;
-    letter-spacing:0.3px;
-  }
-  .card .card-foot{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-top:10px;
-  }
-  .card .delete-btn{
-    background:none;
-    border:1px solid #6b3a3a;
-    color:#e0765f;
-    padding:4px 10px;
-    border-radius:6px;
-    font-family:inherit;
     font-size:0.72rem;
-    cursor:pointer;
+    color:#8fce5a;
+    margin:0 0 14px;
+    display:none;
   }
-  .card .delete-btn:hover{ background:#6b3a3a; color:#fff; }
-  .empty{
-    color:#8b93a3;
-    text-align:center;
-    padding:40px 20px;
-    font-size:0.9rem;
+  .tabs{
+    display:flex; gap:8px; margin-bottom:18px;
+    background:#20242e; border:1px solid #333a48; border-radius:10px; padding:4px;
   }
-  .add-box{
-    margin-top:22px;
-    background:#262b36;
-    border:1px solid #333a48;
-    border-radius:12px;
-    padding:16px;
+  .tabs button{
+    flex:1; background:none; border:none; color:#8b93a3;
+    font-family:inherit; font-size:0.85rem; padding:9px 0; border-radius:8px; cursor:pointer;
   }
-  .add-box label{
-    display:block;
-    color:#8b93a3;
-    font-size:0.75rem;
-    margin-bottom:8px;
+  .tabs button.active{ background:#3d7bfd; color:#fff; }
+  .panel{ display:none; }
+  .panel.active{ display:block; }
+  .list{ display:flex; flex-direction:column; gap:14px; }
+  .card{
+    background:#262b36; border:1px solid #333a48; border-radius:12px;
+    padding:20px; box-shadow:0 6px 18px rgba(0,0,0,0.3); position:relative;
+  }
+  .card.pinned{ border-color:#c9a227; box-shadow:0 6px 18px rgba(201,162,39,0.15); }
+  .pin-badge{
+    display:inline-block; background:#3a3220; color:#e0c25f;
+    font-size:0.68rem; padding:3px 8px; border-radius:6px; margin-bottom:10px;
+  }
+  .card .icon{ font-size:1.3rem; margin-bottom:10px; }
+  .card .author{ color:#3d7bfd; font-size:0.8rem; font-weight:600; margin:0 0 6px; word-break:break-word; }
+  .card .message{
+    color:#e8e9ec; font-size:1rem; line-height:1.6; margin:0 0 10px;
+    white-space:pre-wrap; word-break:break-word;
+  }
+  .card .timestamp{ color:#8b93a3; font-size:0.75rem; letter-spacing:0.3px; }
+  .card .card-foot{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:10px; flex-wrap:wrap; gap:8px;
+  }
+  .btn-group{ display:flex; gap:6px; flex-wrap:wrap; }
+  .pin-btn{
+    background:none; border:1px solid #6b5c2a; color:#e0c25f;
+    padding:4px 10px; border-radius:6px; font-family:inherit; font-size:0.72rem; cursor:pointer;
+  }
+  .pin-btn:hover{ background:#6b5c2a; color:#fff; }
+  .delete-btn{
+    background:none; border:1px solid #6b3a3a; color:#e0765f;
+    padding:4px 10px; border-radius:6px; font-family:inherit; font-size:0.72rem; cursor:pointer;
+  }
+  .delete-btn:hover{ background:#6b3a3a; color:#fff; }
+  .kick-btn{
+    background:none; border:1px solid #6b4a2a; color:#e09a5f;
+    padding:4px 10px; border-radius:6px; font-family:inherit; font-size:0.72rem; cursor:pointer;
+  }
+  .kick-btn:hover{ background:#6b4a2a; color:#fff; }
+  .empty{ color:#8b93a3; text-align:center; padding:40px 20px; font-size:0.9rem; }
+  .add-box{ margin-top:22px; background:#262b36; border:1px solid #333a48; border-radius:12px; padding:16px; }
+  .add-box label{ display:block; color:#8b93a3; font-size:0.75rem; margin-bottom:8px; }
+  .add-box input[type="text"], .add-box input[type="password"]{
+    width:100%; background:#1c1f26; border:1px solid #333a48; border-radius:8px;
+    color:#e8e9ec; font-family:inherit; font-size:0.9rem; padding:9px 10px; outline:none; margin-bottom:12px;
   }
   .add-box textarea{
-    width:100%;
-    min-height:90px;
-    background:#1c1f26;
-    border:1px solid #333a48;
-    border-radius:8px;
-    color:#e8e9ec;
-    font-family:inherit;
-    font-size:0.9rem;
-    padding:10px;
-    resize:vertical;
-    outline:none;
+    width:100%; min-height:90px; background:#1c1f26; border:1px solid #333a48; border-radius:8px;
+    color:#e8e9ec; font-family:inherit; font-size:0.9rem; padding:10px; resize:vertical; outline:none;
   }
-  .add-box .row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-top:10px;
-  }
-  .add-box .hint{
-    color:#6b7383;
-    font-size:0.72rem;
-  }
+  .add-box .row{ display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
+  .add-box .hint{ color:#6b7383; font-size:0.72rem; }
+  .add-box .pin-hint{ color:#6b7383; font-size:0.68rem; margin:-6px 0 12px; }
   .add-box button{
-    background:#3d7bfd;
-    color:#fff;
-    border:none;
-    border-radius:8px;
-    padding:9px 16px;
-    font-size:0.85rem;
-    cursor:pointer;
+    background:#3d7bfd; color:#fff; border:none; border-radius:8px;
+    padding:9px 16px; font-size:0.85rem; cursor:pointer;
   }
   .add-box button:hover{ background:#2f68e0; }
   .admin-toggle{
-    display:block;
-    margin:22px auto 0;
-    background:none;
-    border:1px solid #333a48;
-    color:#6b7383;
-    padding:6px 14px;
-    border-radius:8px;
-    font-family:inherit;
-    font-size:0.72rem;
-    cursor:pointer;
+    display:block; margin:22px auto 0; background:none; border:1px solid #333a48; color:#6b7383;
+    padding:6px 14px; border-radius:8px; font-family:inherit; font-size:0.72rem; cursor:pointer;
   }
   .admin-toggle:hover{ color:#8b93a3; border-color:#4a5468; }
-  .login-box{
-    margin-top:14px;
-    background:#262b36;
-    border:1px solid #333a48;
-    border-radius:12px;
-    padding:16px;
-  }
-  .login-box label{
-    display:block;
-    color:#8b93a3;
-    font-size:0.75rem;
-    margin-bottom:6px;
-  }
+  .login-box{ margin-top:14px; background:#262b36; border:1px solid #333a48; border-radius:12px; padding:16px; }
+  .login-box label{ display:block; color:#8b93a3; font-size:0.75rem; margin-bottom:6px; }
   .login-box input{
-    width:100%;
-    background:#1c1f26;
-    border:1px solid #333a48;
-    border-radius:8px;
-    color:#e8e9ec;
-    font-family:inherit;
-    font-size:0.9rem;
-    padding:9px 10px;
-    outline:none;
-    margin-bottom:10px;
+    width:100%; background:#1c1f26; border:1px solid #333a48; border-radius:8px;
+    color:#e8e9ec; font-family:inherit; font-size:0.9rem; padding:9px 10px; outline:none; margin-bottom:10px;
   }
-  .login-box .row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-  }
-  .login-box .err{
-    color:#e0765f;
-    font-size:0.75rem;
-    margin:0 0 10px;
-    display:none;
-  }
+  .login-box .row{ display:flex; align-items:center; justify-content:space-between; }
+  .login-box .err{ color:#e0765f; font-size:0.75rem; margin:0 0 10px; display:none; }
   .login-box button{
-    background:#3d7bfd;
-    color:#fff;
-    border:none;
-    border-radius:8px;
-    padding:9px 16px;
-    font-size:0.85rem;
-    cursor:pointer;
+    background:#3d7bfd; color:#fff; border:none; border-radius:8px;
+    padding:9px 16px; font-size:0.85rem; cursor:pointer;
   }
   .login-box button:hover{ background:#2f68e0; }
   .logout-btn{
-    background:none;
-    border:1px solid #6b3a3a;
-    color:#e0765f;
-    padding:4px 10px;
-    border-radius:6px;
-    font-family:inherit;
-    font-size:0.72rem;
-    cursor:pointer;
+    background:none; border:1px solid #6b3a3a; color:#e0765f; padding:4px 10px;
+    border-radius:6px; font-family:inherit; font-size:0.72rem; cursor:pointer;
+  }
+  .admin-badge{
+    display:inline-block; background:#2f3a2a; color:#8fce5a; font-size:0.65rem;
+    padding:2px 7px; border-radius:5px; margin-left:6px; vertical-align:middle;
+  }
+
+  /* Group chat */
+  .pinned-strip{
+    background:#262b36; border:1px solid #6b5c2a; border-radius:10px;
+    padding:10px 12px; margin-bottom:12px; display:none;
+  }
+  .pinned-strip .ps-title{ color:#e0c25f; font-size:0.7rem; font-weight:600; margin:0 0 8px; }
+  .pinned-strip .ps-item{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:8px; padding:6px 0; border-top:1px solid #333a48;
+  }
+  .pinned-strip .ps-item:first-of-type{ border-top:none; }
+  .pinned-strip .ps-text{ color:#e8e9ec; font-size:0.8rem; word-break:break-word; }
+  .pinned-strip .ps-author{ color:#3d7bfd; font-size:0.68rem; display:block; margin-bottom:2px; }
+  .gc-window{
+    background:#262b36; border:1px solid #333a48; border-radius:12px; padding:14px;
+    height:400px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;
+  }
+  .gc-msg{
+    max-width:82%; background:#1c1f26; border:1px solid #333a48; border-radius:10px;
+    padding:8px 12px; align-self:flex-start;
+  }
+  .gc-msg.me{ align-self:flex-end; background:#26365e; border-color:#3d4f8f; }
+  .gc-msg .gc-author{ color:#3d7bfd; font-size:0.72rem; font-weight:600; margin:0 0 3px; word-break:break-word; }
+  .gc-msg .gc-text{ color:#e8e9ec; font-size:0.92rem; line-height:1.45; white-space:pre-wrap; word-break:break-word; margin:0; }
+  .gc-msg .gc-time{ color:#6b7383; font-size:0.65rem; margin-top:4px; display:block; }
+  .gc-msg .gc-admin-row{ display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
+  .gc-input-row{ margin-top:12px; display:flex; gap:8px; }
+  .gc-input-row input[type="text"].gc-text-input{
+    flex:1; background:#262b36; border:1px solid #333a48; border-radius:8px;
+    color:#e8e9ec; font-family:inherit; font-size:0.9rem; padding:10px; outline:none; margin-bottom:0;
+  }
+  .gc-input-row button{
+    background:#3d7bfd; color:#fff; border:none; border-radius:8px;
+    padding:0 18px; font-size:0.85rem; cursor:pointer;
+  }
+  .gc-input-row button:hover{ background:#2f68e0; }
+  .gc-name-row{ margin-top:16px; }
+  .gc-name-row label{ display:block; color:#8b93a3; font-size:0.75rem; margin-bottom:8px; }
+  .gc-name-row input[type="text"]{
+    width:100%; background:#262b36; border:1px solid #333a48; border-radius:8px;
+    color:#e8e9ec; font-family:inherit; font-size:0.9rem; padding:9px 10px; outline:none;
   }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>📢 Mga Announcement</h1>
-    <div class="list" id="list"></div>
+    <h1>🔥 HOT VPN</h1>
+    <p class="subtitle">Forum at Group Chat — malayang makapag-post o makipag-usap ang lahat</p>
+    <p class="admin-status" id="adminStatus">✅ Naka-login bilang ADMIN — may kapangyarihan ka mag-delete, mag-pin, at mag-kick kahit saan.</p>
 
-    <div class="add-box" id="addBox" style="display:none;">
-      <label for="newMsg">Magdagdag ng tala — isang linya, isang tala (pwedeng maramihan)</label>
-      <textarea id="newMsg"></textarea>
-      <div class="row">
-        <span class="hint" id="countHint"></span>
-        <button id="addBtn">Idagdag</button>
+    <div class="tabs">
+      <button id="tabForumBtn" class="active">📢 Forum</button>
+      <button id="tabGcBtn">💬 Group Chat</button>
+    </div>
+
+    <!-- FORUM PANEL -->
+    <div class="panel active" id="panelForum">
+      <div class="list" id="list"></div>
+
+      <div class="add-box" id="postBox">
+        <label for="postName">Pangalan / Username</label>
+        <input type="text" id="postName" placeholder="Ilagay ang iyong pangalan">
+        <label for="newMsg">Mensahe</label>
+        <textarea id="newMsg" placeholder="Isulat dito ang iyong post..."></textarea>
+        <label for="postPin">4-Digit PIN (itago ito — kailangan mo 'to para tanggalin o i-pin ang sarili mong post)</label>
+        <input type="password" id="postPin" inputmode="numeric" maxlength="4" placeholder="hal. 1234">
+        <div class="row">
+          <span class="hint" id="countHint"></span>
+          <button id="addBtn">I-post</button>
+        </div>
       </div>
-      <div class="row" style="margin-top:10px;">
-        <span></span>
-        <button class="logout-btn" id="logoutBtn">Mag-logout</button>
+
+      <button class="admin-toggle" id="adminToggle">🔒 Admin Login</button>
+      <div class="login-box" id="loginBox" style="display:none;">
+        <label for="adminUser">Username</label>
+        <input type="text" id="adminUser" autocomplete="username">
+        <label for="adminPass">Password</label>
+        <input type="password" id="adminPass" autocomplete="current-password">
+        <p class="err" id="loginErr">Mali ang username o password.</p>
+        <div class="row">
+          <span></span>
+          <button id="loginBtn">Mag-login</button>
+        </div>
+      </div>
+      <div class="row" id="adminBar" style="display:none; margin-top:10px; justify-content:flex-end;">
+        <button class="logout-btn" id="logoutBtn">Mag-logout ng Admin</button>
       </div>
     </div>
 
-    <button class="admin-toggle" id="adminToggle">🔒 Admin Login</button>
-    <div class="login-box" id="loginBox" style="display:none;">
-      <label for="adminUser">Username</label>
-      <input type="text" id="adminUser" autocomplete="username">
-      <label for="adminPass">Password</label>
-      <input type="password" id="adminPass" autocomplete="current-password">
-      <p class="err" id="loginErr">Mali ang username o password.</p>
-      <div class="row">
-        <span></span>
-        <button id="loginBtn">Mag-login</button>
+    <!-- GROUP CHAT PANEL -->
+    <div class="panel" id="panelGc">
+      <div class="pinned-strip" id="pinnedStrip">
+        <p class="ps-title">📌 Mga Pinned na Mensahe</p>
+        <div id="pinnedList"></div>
+      </div>
+      <div class="gc-window" id="gcWindow"></div>
+      <div class="gc-name-row">
+        <label for="gcName">Pangalan mo sa GC</label>
+        <input type="text" id="gcName" placeholder="Ilagay ang iyong pangalan">
+      </div>
+      <div class="gc-name-row" style="margin-top:10px;">
+        <label for="gcPin">4-Digit PIN (kailangan mo 'to para tanggalin o i-pin ang sarili mong mensahe)</label>
+        <input type="password" id="gcPin" inputmode="numeric" maxlength="4" placeholder="hal. 1234">
+      </div>
+      <div class="gc-input-row">
+        <input type="text" class="gc-text-input" id="gcText" placeholder="Mag-type ng mensahe...">
+        <button id="gcSendBtn">Send</button>
       </div>
     </div>
   </div>
@@ -226,12 +231,11 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
-    getFirestore, collection, onSnapshot,
-    addDoc, deleteDoc, doc, serverTimestamp
+    getFirestore, collection, onSnapshot, query, orderBy,
+    addDoc, deleteDoc, updateDoc, doc, setDoc, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   // 🔧 Palitan ito ng config mula sa iyong Firebase project
-  // (Firebase console > Project settings > Your apps > SDK setup and configuration)
   const firebaseConfig = {
     apiKey: "AIzaSyDvbz3f2biSJ344LgxyM1hA8SguUgtiMKg",
     authDomain: "ambervpn-c7814.firebaseapp.com",
@@ -248,65 +252,57 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const colRef = collection(db, 'announcements');
+  const gcColRef = collection(db, 'groupchat');
+  const bannedColRef = collection(db, 'banned');
 
   let items = [];
-
-  function formatDate(ts){
-    return new Date(ts).toLocaleString('fil-PH', {
-      year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'
-    });
-  }
+  let gcMsgs = [];
+  let bannedSet = new Set();
 
   function escapeHtml(str){
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
   }
+  function formatDate(ts){
+    return new Date(ts).toLocaleString('fil-PH', {
+      year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'
+    });
+  }
+  function gcFormatTime(ts){
+    return new Date(ts).toLocaleTimeString('fil-PH', { hour:'2-digit', minute:'2-digit' });
+  }
+  function normName(n){ return (n || '').trim().toLowerCase(); }
 
+  /* ---------- TABS ---------- */
+  const tabForumBtn = document.getElementById('tabForumBtn');
+  const tabGcBtn = document.getElementById('tabGcBtn');
+  const panelForum = document.getElementById('panelForum');
+  const panelGc = document.getElementById('panelGc');
+
+  tabForumBtn.addEventListener('click', () => {
+    tabForumBtn.classList.add('active'); tabGcBtn.classList.remove('active');
+    panelForum.classList.add('active'); panelGc.classList.remove('active');
+  });
+  tabGcBtn.addEventListener('click', () => {
+    tabGcBtn.classList.add('active'); tabForumBtn.classList.remove('active');
+    panelGc.classList.add('active'); panelForum.classList.remove('active');
+    scrollGcToBottom();
+  });
+
+  /* ---------- ADMIN LOGIN ---------- */
   function applyAdminUi(){
-    document.getElementById('addBox').style.display = isAdmin ? 'block' : 'none';
     document.getElementById('adminToggle').style.display = isAdmin ? 'none' : 'block';
+    document.getElementById('adminBar').style.display = isAdmin ? 'flex' : 'none';
     document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('adminStatus').style.display = isAdmin ? 'block' : 'none';
   }
-
-  function render(){
-    const listEl = document.getElementById('list');
-    if(items.length === 0){
-      listEl.innerHTML = '<div class="empty">Wala pang announcement.</div>';
-      return;
-    }
-    const sorted = [...items].sort((a,b)=> b.updatedAt - a.updatedAt);
-    listEl.innerHTML = sorted.map(item => `
-      <div class="card">
-        <div class="icon">📢</div>
-        <p class="message">${escapeHtml(item.text)}</p>
-        <div class="card-foot">
-          <div class="timestamp">Updated: ${formatDate(item.updatedAt)}</div>
-          ${isAdmin ? `<button class="delete-btn" data-id="${item.id}">Tanggalin</button>` : ''}
-        </div>
-      </div>
-    `).join('');
-
-    if(isAdmin){
-      listEl.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          try{
-            await deleteDoc(doc(db, 'announcements', btn.dataset.id));
-          }catch(e){
-            alert('Hindi natanggal: ' + e.message);
-          }
-        });
-      });
-    }
-  }
-
   applyAdminUi();
 
   document.getElementById('adminToggle').addEventListener('click', () => {
     document.getElementById('loginBox').style.display = 'block';
     document.getElementById('adminUser').focus();
   });
-
   document.getElementById('loginBtn').addEventListener('click', () => {
     const u = document.getElementById('adminUser').value.trim();
     const p = document.getElementById('adminPass').value;
@@ -316,67 +312,298 @@
       document.getElementById('adminUser').value = '';
       document.getElementById('adminPass').value = '';
       document.getElementById('loginErr').style.display = 'none';
-      applyAdminUi();
-      render();
+      applyAdminUi(); render(); renderGc();
     }else{
       document.getElementById('loginErr').style.display = 'block';
     }
   });
-
   document.getElementById('adminPass').addEventListener('keydown', (e) => {
     if(e.key === 'Enter') document.getElementById('loginBtn').click();
   });
-
   document.getElementById('logoutBtn').addEventListener('click', () => {
     isAdmin = false;
     sessionStorage.removeItem('announceAdmin');
-    applyAdminUi();
-    render();
+    applyAdminUi(); render(); renderGc();
   });
 
-  // Live sync: awtomatikong nag-a-update ang view kapag may pagbabago sa Firestore
+  /* ---------- BANNED / KICK ---------- */
+  onSnapshot(bannedColRef, (snap) => {
+    bannedSet = new Set(snap.docs.map(d => d.id));
+  }, (err) => console.error('Firestore error (banned):', err));
+
+  async function kickAuthor(author, sourceLabel){
+    if(!isAdmin) return;
+    const name = normName(author);
+    if(!name){ alert('Walang pangalan.'); return; }
+    if(!confirm(`I-kick si "${author}"? Mabablock siyang mag-post/mag-chat, at matatanggal ang lahat ng kanyang mensahe.`)) return;
+    try{
+      await setDoc(doc(db, 'banned', name), { author, bannedAt: serverTimestamp() });
+      const forumDeletes = items.filter(i => normName(i.author) === name).map(i => deleteDoc(doc(db, 'announcements', i.id)));
+      const gcDeletes = gcMsgs.filter(m => normName(m.author) === name).map(m => deleteDoc(doc(db, 'groupchat', m.id)));
+      await Promise.all([...forumDeletes, ...gcDeletes]);
+      alert(`Na-kick si "${author}".`);
+    }catch(e){
+      alert('Hindi na-kick: ' + e.message);
+    }
+  }
+
+  /* ---------- FORUM ---------- */
+  async function requestPin(actionLabel){
+    return window.prompt(`Ilagay ang 4-digit PIN mo para ${actionLabel}:`);
+  }
+
+  function render(){
+    const listEl = document.getElementById('list');
+    if(items.length === 0){
+      listEl.innerHTML = '<div class="empty">Wala pang post. Maging una!</div>';
+      return;
+    }
+    const sorted = [...items].sort((a,b)=>{
+      if(!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+      return b.updatedAt - a.updatedAt;
+    });
+    listEl.innerHTML = sorted.map(item => `
+      <div class="card ${item.pinned ? 'pinned' : ''}" data-id="${item.id}">
+        ${item.pinned ? '<div class="pin-badge">📌 Naka-pin</div>' : ''}
+        <div class="icon">📢</div>
+        <p class="author">${escapeHtml(item.author || 'Anonymous')}</p>
+        <p class="message">${escapeHtml(item.text)}</p>
+        <div class="card-foot">
+          <div class="timestamp">${formatDate(item.updatedAt)}</div>
+          <div class="btn-group">
+            <button class="pin-btn" data-id="${item.id}" data-action="pin">${item.pinned ? 'Alisin sa Pin' : 'I-pin'}</button>
+            <button class="delete-btn" data-id="${item.id}" data-action="delete">Tanggalin</button>
+            ${isAdmin ? `<button class="kick-btn" data-author="${escapeHtml(item.author||'')}" data-action="kick">Kick</button>` : ''}
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    listEl.querySelectorAll('.pin-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const item = items.find(i => i.id === id);
+        if(!item) return;
+        if(!isAdmin){
+          const pin = await requestPin(item.pinned ? 'alisin sa pin ang post' : 'i-pin ang post');
+          if(pin === null) return;
+          if((pin || '').trim() !== (item.pin || '')){ alert('Maling PIN.'); return; }
+        }
+        try{
+          await updateDoc(doc(db, 'announcements', id), { pinned: !item.pinned });
+        }catch(e){ alert('Hindi na-update: ' + e.message); }
+      });
+    });
+
+    listEl.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const item = items.find(i => i.id === id);
+        if(!item) return;
+        if(!isAdmin){
+          const pin = await requestPin('tanggalin ang post');
+          if(pin === null) return;
+          if((pin || '').trim() !== (item.pin || '')){ alert('Maling PIN.'); return; }
+        }else{
+          if(!confirm('Tanggalin ang post na ito?')) return;
+        }
+        try{
+          await deleteDoc(doc(db, 'announcements', id));
+        }catch(e){ alert('Hindi natanggal: ' + e.message); }
+      });
+    });
+
+    listEl.querySelectorAll('.kick-btn').forEach(btn => {
+      btn.addEventListener('click', () => kickAuthor(btn.dataset.author, 'forum'));
+    });
+  }
+
   onSnapshot(colRef, (snap) => {
     items = snap.docs.map(d => {
       const data = d.data();
       return {
-        id: d.id,
-        text: data.text,
+        id: d.id, text: data.text, author: data.author,
+        pin: data.pin || '', pinned: !!data.pinned,
         updatedAt: data.updatedAt?.toMillis ? data.updatedAt.toMillis() : Date.now()
       };
     });
     render();
-  }, (err) => {
-    console.error('Firestore error:', err);
-  });
+  }, (err) => console.error('Firestore error (announcements):', err));
 
   function updateCountHint(){
     const raw = document.getElementById('newMsg').value;
-    const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
-    const hint = document.getElementById('countHint');
-    hint.textContent = lines.length > 0 ? (lines.length + (lines.length === 1 ? ' tala' : ' na tala')) : '';
+    const len = raw.trim().length;
+    document.getElementById('countHint').textContent = len > 0 ? (len + ' character/s') : '';
   }
-
   document.getElementById('newMsg').addEventListener('input', updateCountHint);
+  document.getElementById('postPin').addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0,4);
+  });
 
   document.getElementById('addBtn').addEventListener('click', async () => {
-    if(!isAdmin) return;
+    const nameInput = document.getElementById('postName');
     const textarea = document.getElementById('newMsg');
-    const lines = textarea.value.split('\n').map(l => l.trim()).filter(Boolean);
-    if(lines.length === 0) return;
+    const pinInput = document.getElementById('postPin');
+    const author = nameInput.value.trim() || 'Anonymous';
+    const text = textarea.value.trim();
+    const pin = pinInput.value.trim();
+
+    if(bannedSet.has(normName(author))){ alert('Naka-kick ka ng admin — hindi ka na makakapag-post.'); return; }
+    if(text.length === 0) return;
+    if(!/^\d{4}$/.test(pin)){ alert('Kailangan ng eksaktong 4-digit na PIN (numero lang).'); return; }
 
     try{
-      for(const line of lines){
-        await addDoc(colRef, {
-          text: line,
-          updatedAt: serverTimestamp()
-        });
-      }
-      textarea.value = '';
+      await addDoc(colRef, { text, author, pin, pinned: false, updatedAt: serverTimestamp() });
+      textarea.value = ''; pinInput.value = '';
       updateCountHint();
-    }catch(e){
-      alert('Hindi naidagdag: ' + e.message);
-    }
+    }catch(e){ alert('Hindi naipost: ' + e.message); }
   });
+
+  document.getElementById('newMsg').addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' && (e.metaKey || e.ctrlKey)) document.getElementById('addBtn').click();
+  });
+
+  /* ---------- GROUP CHAT ---------- */
+  const gcWindow = document.getElementById('gcWindow');
+  const gcNameInput = document.getElementById('gcName');
+  const gcTextInput = document.getElementById('gcText');
+  const gcSendBtn = document.getElementById('gcSendBtn');
+  const pinnedStrip = document.getElementById('pinnedStrip');
+  const pinnedList = document.getElementById('pinnedList');
+
+  const gcPinInput = document.getElementById('gcPin');
+  gcNameInput.value = localStorage.getItem('gcName') || '';
+  gcPinInput.value = localStorage.getItem('gcPin') || '';
+  gcNameInput.addEventListener('input', () => {
+    localStorage.setItem('gcName', gcNameInput.value);
+    renderGc();
+  });
+  gcPinInput.addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0,4);
+    localStorage.setItem('gcPin', gcPinInput.value);
+  });
+
+  function scrollGcToBottom(){ gcWindow.scrollTop = gcWindow.scrollHeight; }
+
+  function renderPinnedStrip(){
+    const pinned = gcMsgs.filter(m => m.pinned);
+    if(pinned.length === 0){ pinnedStrip.style.display = 'none'; return; }
+    pinnedStrip.style.display = 'block';
+    pinnedList.innerHTML = pinned.map(m => `
+      <div class="ps-item">
+        <div>
+          <span class="ps-author">${escapeHtml(m.author || 'Anonymous')}</span>
+          <span class="ps-text">${escapeHtml(m.text)}</span>
+        </div>
+        <button class="pin-btn" data-id="${m.id}" data-action="unpin" style="white-space:nowrap;">Alisin</button>
+      </div>
+    `).join('');
+    pinnedList.querySelectorAll('.pin-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const msg = gcMsgs.find(x => x.id === id);
+        if(!msg) return;
+        if(!isAdmin){
+          const pin = await requestPin('alisin sa pin ang mensahe');
+          if(pin === null) return;
+          if((pin || '').trim() !== (msg.pin || '')){ alert('Maling PIN.'); return; }
+        }
+        try{ await updateDoc(doc(db, 'groupchat', id), { pinned: false }); }
+        catch(e){ alert('Hindi na-update: ' + e.message); }
+      });
+    });
+  }
+
+  function renderGc(){
+    if(gcMsgs.length === 0){
+      gcWindow.innerHTML = '<div class="empty">Simulan ang usapan — walang limitasyon!</div>';
+      renderPinnedStrip();
+      return;
+    }
+    const myName = normName(gcNameInput.value);
+    gcWindow.innerHTML = gcMsgs.map(m => {
+      const mine = myName && normName(m.author) === myName;
+      return `
+        <div class="gc-msg ${mine ? 'me' : ''}" data-id="${m.id}">
+          <p class="gc-author">${escapeHtml(m.author || 'Anonymous')}${m.pinned ? ' 📌' : ''}</p>
+          <p class="gc-text">${escapeHtml(m.text)}</p>
+          <span class="gc-time">${gcFormatTime(m.createdAt)}</span>
+          <div class="gc-admin-row">
+            <button class="pin-btn" data-id="${m.id}" data-action="${m.pinned ? 'unpin' : 'pin'}">${m.pinned ? 'Alisin sa Pin' : 'I-pin'}</button>
+            <button class="delete-btn" data-id="${m.id}" data-action="delete">Tanggalin</button>
+            ${isAdmin ? `<button class="kick-btn" data-author="${escapeHtml(m.author||'')}" data-action="kick">Kick</button>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    gcWindow.querySelectorAll('.pin-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const msg = gcMsgs.find(x => x.id === id);
+        if(!msg) return;
+        const wantPinned = btn.dataset.action === 'pin';
+        if(!isAdmin){
+          const pin = await requestPin(wantPinned ? 'i-pin ang mensahe' : 'alisin sa pin ang mensahe');
+          if(pin === null) return;
+          if((pin || '').trim() !== (msg.pin || '')){ alert('Maling PIN.'); return; }
+        }
+        try{ await updateDoc(doc(db, 'groupchat', id), { pinned: wantPinned }); }
+        catch(e){ alert('Hindi na-update: ' + e.message); }
+      });
+    });
+    gcWindow.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const msg = gcMsgs.find(x => x.id === id);
+        if(!msg) return;
+        if(!isAdmin){
+          const pin = await requestPin('tanggalin ang mensahe');
+          if(pin === null) return;
+          if((pin || '').trim() !== (msg.pin || '')){ alert('Maling PIN.'); return; }
+        }else{
+          if(!confirm('Tanggalin ang mensaheng ito?')) return;
+        }
+        try{ await deleteDoc(doc(db, 'groupchat', id)); }
+        catch(e){ alert('Hindi natanggal: ' + e.message); }
+      });
+    });
+    if(isAdmin){
+      gcWindow.querySelectorAll('.kick-btn').forEach(btn => {
+        btn.addEventListener('click', () => kickAuthor(btn.dataset.author, 'gc'));
+      });
+    }
+    renderPinnedStrip();
+    scrollGcToBottom();
+  }
+
+  const gcQuery = query(gcColRef, orderBy('createdAt', 'asc'));
+  onSnapshot(gcQuery, (snap) => {
+    gcMsgs = snap.docs.map(d => {
+      const data = d.data();
+      return {
+        id: d.id, text: data.text, author: data.author, pin: data.pin || '', pinned: !!data.pinned,
+        createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : Date.now()
+      };
+    });
+    renderGc();
+  }, (err) => console.error('Firestore error (groupchat):', err));
+
+  async function sendGcMessage(){
+    const author = gcNameInput.value.trim() || 'Anonymous';
+    const text = gcTextInput.value.trim();
+    const pin = gcPinInput.value.trim();
+    if(bannedSet.has(normName(author))){ alert('Naka-kick ka ng admin — hindi ka na makakapag-chat.'); return; }
+    if(text.length === 0) return;
+    if(!/^\d{4}$/.test(pin)){ alert('Kailangan ng eksaktong 4-digit na PIN (numero lang) bago makapag-send.'); return; }
+    try{
+      await addDoc(gcColRef, { text, author, pin, pinned: false, createdAt: serverTimestamp() });
+      gcTextInput.value = ''; gcTextInput.focus();
+    }catch(e){ alert('Hindi naipadala: ' + e.message); }
+  }
+
+  gcSendBtn.addEventListener('click', sendGcMessage);
+  gcTextInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') sendGcMessage(); });
 </script>
 </body>
 </html>
