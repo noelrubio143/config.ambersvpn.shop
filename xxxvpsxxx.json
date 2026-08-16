@@ -50,6 +50,22 @@
   {
     "authType": "password",
     "connectionType": "ssl_payload_proxy_ws",
+    "group": "TNT",
+    "host": "tokyo.ambersvpn.shop",
+    "hostSource": "cf",
+    "id": "2100865b-c6b7-4def-a9d4-5f8cfbf1b3d6",
+    "name": "SAYA ALL TIKTOK TOKYO",
+    "password": "n",
+    "payload": "GET / HTTP/1.1[crlf]Host: tokyo.ambersvpn.shop[crlf]Upgrade: websocket[crlf][crlf]",
+    "port": 443,
+    "proxyHost": "api24-normal.tiktokv.com",
+    "proxyPort": "443",
+    "sni": "tiktok.ambersvpn.shop",
+    "username": "n"
+  },
+  {
+    "authType": "password",
+    "connectionType": "ssl_payload_proxy_ws",
     "group": "GLOBE",
     "host": "ph8gb.ambersvpn.shop",
     "hostSource": "cf",
