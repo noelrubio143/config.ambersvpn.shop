@@ -73,7 +73,6 @@
   }
   .add-box .row{ display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
   .add-box .hint{ color:#6b7383; font-size:0.72rem; }
-  .add-box .pin-hint{ color:#6b7383; font-size:0.68rem; margin:-6px 0 12px; }
   .add-box button{
     background:#3d7bfd; color:#fff; border:none; border-radius:8px;
     padding:9px 16px; font-size:0.85rem; cursor:pointer;
@@ -120,8 +119,6 @@
       <input type="text" id="postName" placeholder="Ilagay ang iyong pangalan">
       <label for="newMsg">Mensahe</label>
       <textarea id="newMsg" placeholder="Isulat dito ang iyong post..."></textarea>
-      <label for="postPin">4-Digit PIN (itago ito — kailangan mo 'to para tanggalin o i-pin ang sarili mong post)</label>
-      <input type="password" id="postPin" inputmode="numeric" maxlength="4" placeholder="hal. 1234">
       <div class="row">
         <span class="hint" id="countHint"></span>
         <button id="addBtn">I-post</button>
@@ -243,9 +240,6 @@
   }
 
   /* ---------- FORUM ---------- */
-  async function requestPin(actionLabel){
-    return window.prompt(`Ilagay ang 4-digit PIN mo para ${actionLabel}:`);
-  }
 
   function render(){
     const listEl = document.getElementById('list');
@@ -266,8 +260,8 @@
         <div class="card-foot">
           <div class="timestamp">${formatDate(item.updatedAt)}</div>
           <div class="btn-group">
-            <button class="pin-btn" data-id="${item.id}" data-action="pin">${item.pinned ? 'Alisin sa Pin' : 'I-pin'}</button>
-            <button class="delete-btn" data-id="${item.id}" data-action="delete">Tanggalin</button>
+            ${isAdmin ? `<button class="pin-btn" data-id="${item.id}" data-action="pin">${item.pinned ? 'Alisin sa Pin' : 'I-pin'}</button>` : ''}
+            ${isAdmin ? `<button class="delete-btn" data-id="${item.id}" data-action="delete">Tanggalin</button>` : ''}
             ${isAdmin ? `<button class="kick-btn" data-author="${escapeHtml(item.author||'')}" data-action="kick">Kick</button>` : ''}
           </div>
         </div>
@@ -276,14 +270,10 @@
 
     listEl.querySelectorAll('.pin-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
+        if(!isAdmin) return;
         const id = btn.dataset.id;
         const item = items.find(i => i.id === id);
         if(!item) return;
-        if(!isAdmin){
-          const pin = await requestPin(item.pinned ? 'alisin sa pin ang post' : 'i-pin ang post');
-          if(pin === null) return;
-          if((pin || '').trim() !== (item.pin || '')){ alert('Maling PIN.'); return; }
-        }
         try{
           await updateDoc(doc(db, 'announcements', id), { pinned: !item.pinned });
         }catch(e){ alert('Hindi na-update: ' + e.message); }
@@ -292,16 +282,11 @@
 
     listEl.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
+        if(!isAdmin) return;
         const id = btn.dataset.id;
         const item = items.find(i => i.id === id);
         if(!item) return;
-        if(!isAdmin){
-          const pin = await requestPin('tanggalin ang post');
-          if(pin === null) return;
-          if((pin || '').trim() !== (item.pin || '')){ alert('Maling PIN.'); return; }
-        }else{
-          if(!confirm('Tanggalin ang post na ito?')) return;
-        }
+        if(!confirm('Tanggalin ang post na ito?')) return;
         try{
           await deleteDoc(doc(db, 'announcements', id));
         }catch(e){ alert('Hindi natanggal: ' + e.message); }
@@ -318,7 +303,7 @@
       const data = d.data();
       return {
         id: d.id, text: data.text, author: data.author,
-        pin: data.pin || '', pinned: !!data.pinned,
+        pinned: !!data.pinned,
         updatedAt: data.updatedAt?.toMillis ? data.updatedAt.toMillis() : Date.now()
       };
     });
@@ -331,26 +316,20 @@
     document.getElementById('countHint').textContent = len > 0 ? (len + ' character/s') : '';
   }
   document.getElementById('newMsg').addEventListener('input', updateCountHint);
-  document.getElementById('postPin').addEventListener('input', (e) => {
-    e.target.value = e.target.value.replace(/\D/g, '').slice(0,4);
-  });
 
   document.getElementById('addBtn').addEventListener('click', async () => {
     if(!isAdmin){ alert('Admin lang ang makakapag-post sa forum na ito.'); return; }
     const nameInput = document.getElementById('postName');
     const textarea = document.getElementById('newMsg');
-    const pinInput = document.getElementById('postPin');
     const author = nameInput.value.trim() || 'Anonymous';
     const text = textarea.value.trim();
-    const pin = pinInput.value.trim();
 
     if(bannedSet.has(normName(author))){ alert('Naka-kick ka ng admin — hindi ka na makakapag-post.'); return; }
     if(text.length === 0) return;
-    if(!/^\d{4}$/.test(pin)){ alert('Kailangan ng eksaktong 4-digit na PIN (numero lang).'); return; }
 
     try{
-      await addDoc(colRef, { text, author, pin, pinned: false, updatedAt: serverTimestamp() });
-      textarea.value = ''; pinInput.value = '';
+      await addDoc(colRef, { text, author, pinned: false, updatedAt: serverTimestamp() });
+      textarea.value = '';
       updateCountHint();
     }catch(e){ alert('Hindi naipost: ' + e.message); }
   });
