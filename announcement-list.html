@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HOT VPN — Forum & GC</title>
+<title>HOT VPN — Forum</title>
 <style>
   *{box-sizing:border-box;}
   body{
@@ -23,17 +23,6 @@
     margin:0 0 14px;
     display:none;
   }
-  .tabs{
-    display:flex; gap:8px; margin-bottom:18px;
-    background:#20242e; border:1px solid #333a48; border-radius:10px; padding:4px;
-  }
-  .tabs button{
-    flex:1; background:none; border:none; color:#8b93a3;
-    font-family:inherit; font-size:0.85rem; padding:9px 0; border-radius:8px; cursor:pointer;
-  }
-  .tabs button.active{ background:#3d7bfd; color:#fff; }
-  .panel{ display:none; }
-  .panel.active{ display:block; }
   .list{ display:flex; flex-direction:column; gap:14px; }
   .card{
     background:#262b36; border:1px solid #333a48; border-radius:12px;
@@ -116,123 +105,50 @@
     display:inline-block; background:#2f3a2a; color:#8fce5a; font-size:0.65rem;
     padding:2px 7px; border-radius:5px; margin-left:6px; vertical-align:middle;
   }
-
-  /* Group chat */
-  .pinned-strip{
-    background:#262b36; border:1px solid #6b5c2a; border-radius:10px;
-    padding:10px 12px; margin-bottom:12px; display:none;
-  }
-  .pinned-strip .ps-title{ color:#e0c25f; font-size:0.7rem; font-weight:600; margin:0 0 8px; }
-  .pinned-strip .ps-item{
-    display:flex; justify-content:space-between; align-items:flex-start;
-    gap:8px; padding:6px 0; border-top:1px solid #333a48;
-  }
-  .pinned-strip .ps-item:first-of-type{ border-top:none; }
-  .pinned-strip .ps-text{ color:#e8e9ec; font-size:0.8rem; word-break:break-word; }
-  .pinned-strip .ps-author{ color:#3d7bfd; font-size:0.68rem; display:block; margin-bottom:2px; }
-  .gc-window{
-    background:#262b36; border:1px solid #333a48; border-radius:12px; padding:14px;
-    height:400px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;
-  }
-  .gc-msg{
-    max-width:82%; background:#1c1f26; border:1px solid #333a48; border-radius:10px;
-    padding:8px 12px; align-self:flex-start;
-  }
-  .gc-msg.me{ align-self:flex-end; background:#26365e; border-color:#3d4f8f; }
-  .gc-msg .gc-author{ color:#3d7bfd; font-size:0.72rem; font-weight:600; margin:0 0 3px; word-break:break-word; }
-  .gc-msg .gc-text{ color:#e8e9ec; font-size:0.92rem; line-height:1.45; white-space:pre-wrap; word-break:break-word; margin:0; }
-  .gc-msg .gc-time{ color:#6b7383; font-size:0.65rem; margin-top:4px; display:block; }
-  .gc-msg .gc-admin-row{ display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
-  .gc-input-row{ margin-top:12px; display:flex; gap:8px; }
-  .gc-input-row input[type="text"].gc-text-input{
-    flex:1; background:#262b36; border:1px solid #333a48; border-radius:8px;
-    color:#e8e9ec; font-family:inherit; font-size:0.9rem; padding:10px; outline:none; margin-bottom:0;
-  }
-  .gc-input-row button{
-    background:#3d7bfd; color:#fff; border:none; border-radius:8px;
-    padding:0 18px; font-size:0.85rem; cursor:pointer;
-  }
-  .gc-input-row button:hover{ background:#2f68e0; }
-  .gc-name-row{ margin-top:16px; }
-  .gc-name-row label{ display:block; color:#8b93a3; font-size:0.75rem; margin-bottom:8px; }
-  .gc-name-row input[type="text"]{
-    width:100%; background:#262b36; border:1px solid #333a48; border-radius:8px;
-    color:#e8e9ec; font-family:inherit; font-size:0.9rem; padding:9px 10px; outline:none;
-  }
 </style>
 </head>
 <body>
   <div class="wrap">
     <h1>🔥 HOT VPN</h1>
-    <p class="subtitle">Forum at Group Chat — malayang makapag-post o makipag-usap ang lahat</p>
+    <p class="subtitle">Forum — malayang makapag-post ang lahat</p>
     <p class="admin-status" id="adminStatus">✅ Naka-login bilang ADMIN — may kapangyarihan ka mag-delete, mag-pin, at mag-kick kahit saan.</p>
 
-    <div class="tabs">
-      <button id="tabForumBtn" class="active">📢 Forum</button>
-      <button id="tabGcBtn">💬 Group Chat</button>
-    </div>
+    <div class="list" id="list"></div>
 
-    <!-- FORUM PANEL -->
-    <div class="panel active" id="panelForum">
-      <div class="list" id="list"></div>
-
-      <div class="add-box" id="postBox">
-        <label for="postName">Pangalan / Username</label>
-        <input type="text" id="postName" placeholder="Ilagay ang iyong pangalan">
-        <label for="newMsg">Mensahe</label>
-        <textarea id="newMsg" placeholder="Isulat dito ang iyong post..."></textarea>
-        <label for="postPin">4-Digit PIN (itago ito — kailangan mo 'to para tanggalin o i-pin ang sarili mong post)</label>
-        <input type="password" id="postPin" inputmode="numeric" maxlength="4" placeholder="hal. 1234">
-        <div class="row">
-          <span class="hint" id="countHint"></span>
-          <button id="addBtn">I-post</button>
-        </div>
-      </div>
-
-      <button class="admin-toggle" id="adminToggle">🔒 Admin Login</button>
-      <div class="login-box" id="loginBox" style="display:none;">
-        <label for="adminUser">Username</label>
-        <input type="text" id="adminUser" autocomplete="username">
-        <label for="adminPass">Password</label>
-        <input type="password" id="adminPass" autocomplete="current-password">
-        <p class="err" id="loginErr">Mali ang username o password.</p>
-        <div class="row">
-          <span></span>
-          <button id="loginBtn">Mag-login</button>
-        </div>
-      </div>
-      <div class="row" id="adminBar" style="display:none; margin-top:10px; justify-content:flex-end;">
-        <button class="logout-btn" id="logoutBtn">Mag-logout ng Admin</button>
+    <div class="add-box" id="postBox">
+      <label for="postName">Pangalan / Username</label>
+      <input type="text" id="postName" placeholder="Ilagay ang iyong pangalan">
+      <label for="newMsg">Mensahe</label>
+      <textarea id="newMsg" placeholder="Isulat dito ang iyong post..."></textarea>
+      <label for="postPin">4-Digit PIN (itago ito — kailangan mo 'to para tanggalin o i-pin ang sarili mong post)</label>
+      <input type="password" id="postPin" inputmode="numeric" maxlength="4" placeholder="hal. 1234">
+      <div class="row">
+        <span class="hint" id="countHint"></span>
+        <button id="addBtn">I-post</button>
       </div>
     </div>
 
-    <!-- GROUP CHAT PANEL -->
-    <div class="panel" id="panelGc">
-      <div class="pinned-strip" id="pinnedStrip">
-        <p class="ps-title">📌 Mga Pinned na Mensahe</p>
-        <div id="pinnedList"></div>
+    <button class="admin-toggle" id="adminToggle">🔒 Admin Login</button>
+    <div class="login-box" id="loginBox" style="display:none;">
+      <label for="adminUser">Username</label>
+      <input type="text" id="adminUser" autocomplete="username">
+      <label for="adminPass">Password</label>
+      <input type="password" id="adminPass" autocomplete="current-password">
+      <p class="err" id="loginErr">Mali ang username o password.</p>
+      <div class="row">
+        <span></span>
+        <button id="loginBtn">Mag-login</button>
       </div>
-      <div class="gc-window" id="gcWindow"></div>
-      <div class="gc-name-row">
-        <label for="gcName">Pangalan mo sa GC</label>
-        <input type="text" id="gcName" placeholder="Ilagay ang iyong pangalan">
-      </div>
-      <div class="gc-name-row" style="margin-top:10px;">
-        <label for="gcPin">4-Digit PIN (kailangan mo 'to para tanggalin o i-pin ang sarili mong mensahe)</label>
-        <input type="password" id="gcPin" inputmode="numeric" maxlength="4" placeholder="hal. 1234">
-      </div>
-      <div class="gc-input-row">
-        <input type="text" class="gc-text-input" id="gcText" placeholder="Mag-type ng mensahe...">
-        <button id="gcSendBtn">Send</button>
-      </div>
+    </div>
+    <div class="row" id="adminBar" style="display:none; margin-top:10px; justify-content:flex-end;">
+      <button class="logout-btn" id="logoutBtn">Mag-logout ng Admin</button>
     </div>
   </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
-    getFirestore, collection, onSnapshot, query, orderBy,
-    addDoc, deleteDoc, updateDoc, doc, setDoc, serverTimestamp
+    getFirestore, collection, onSnapshot, addDoc, deleteDoc, updateDoc, doc, setDoc, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   // 🔧 Palitan ito ng config mula sa iyong Firebase project
@@ -252,11 +168,9 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const colRef = collection(db, 'announcements');
-  const gcColRef = collection(db, 'groupchat');
   const bannedColRef = collection(db, 'banned');
 
   let items = [];
-  let gcMsgs = [];
   let bannedSet = new Set();
 
   function escapeHtml(str){
@@ -269,26 +183,7 @@
       year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'
     });
   }
-  function gcFormatTime(ts){
-    return new Date(ts).toLocaleTimeString('fil-PH', { hour:'2-digit', minute:'2-digit' });
-  }
   function normName(n){ return (n || '').trim().toLowerCase(); }
-
-  /* ---------- TABS ---------- */
-  const tabForumBtn = document.getElementById('tabForumBtn');
-  const tabGcBtn = document.getElementById('tabGcBtn');
-  const panelForum = document.getElementById('panelForum');
-  const panelGc = document.getElementById('panelGc');
-
-  tabForumBtn.addEventListener('click', () => {
-    tabForumBtn.classList.add('active'); tabGcBtn.classList.remove('active');
-    panelForum.classList.add('active'); panelGc.classList.remove('active');
-  });
-  tabGcBtn.addEventListener('click', () => {
-    tabGcBtn.classList.add('active'); tabForumBtn.classList.remove('active');
-    panelGc.classList.add('active'); panelForum.classList.remove('active');
-    scrollGcToBottom();
-  });
 
   /* ---------- ADMIN LOGIN ---------- */
   function applyAdminUi(){
@@ -312,7 +207,7 @@
       document.getElementById('adminUser').value = '';
       document.getElementById('adminPass').value = '';
       document.getElementById('loginErr').style.display = 'none';
-      applyAdminUi(); render(); renderGc();
+      applyAdminUi(); render();
     }else{
       document.getElementById('loginErr').style.display = 'block';
     }
@@ -323,7 +218,7 @@
   document.getElementById('logoutBtn').addEventListener('click', () => {
     isAdmin = false;
     sessionStorage.removeItem('announceAdmin');
-    applyAdminUi(); render(); renderGc();
+    applyAdminUi(); render();
   });
 
   /* ---------- BANNED / KICK ---------- */
@@ -331,16 +226,15 @@
     bannedSet = new Set(snap.docs.map(d => d.id));
   }, (err) => console.error('Firestore error (banned):', err));
 
-  async function kickAuthor(author, sourceLabel){
+  async function kickAuthor(author){
     if(!isAdmin) return;
     const name = normName(author);
     if(!name){ alert('Walang pangalan.'); return; }
-    if(!confirm(`I-kick si "${author}"? Mabablock siyang mag-post/mag-chat, at matatanggal ang lahat ng kanyang mensahe.`)) return;
+    if(!confirm(`I-kick si "${author}"? Mabablock siyang mag-post, at matatanggal ang lahat ng kanyang mensahe.`)) return;
     try{
       await setDoc(doc(db, 'banned', name), { author, bannedAt: serverTimestamp() });
       const forumDeletes = items.filter(i => normName(i.author) === name).map(i => deleteDoc(doc(db, 'announcements', i.id)));
-      const gcDeletes = gcMsgs.filter(m => normName(m.author) === name).map(m => deleteDoc(doc(db, 'groupchat', m.id)));
-      await Promise.all([...forumDeletes, ...gcDeletes]);
+      await Promise.all(forumDeletes);
       alert(`Na-kick si "${author}".`);
     }catch(e){
       alert('Hindi na-kick: ' + e.message);
@@ -414,7 +308,7 @@
     });
 
     listEl.querySelectorAll('.kick-btn').forEach(btn => {
-      btn.addEventListener('click', () => kickAuthor(btn.dataset.author, 'forum'));
+      btn.addEventListener('click', () => kickAuthor(btn.dataset.author));
     });
   }
 
@@ -462,148 +356,6 @@
   document.getElementById('newMsg').addEventListener('keydown', (e) => {
     if(e.key === 'Enter' && (e.metaKey || e.ctrlKey)) document.getElementById('addBtn').click();
   });
-
-  /* ---------- GROUP CHAT ---------- */
-  const gcWindow = document.getElementById('gcWindow');
-  const gcNameInput = document.getElementById('gcName');
-  const gcTextInput = document.getElementById('gcText');
-  const gcSendBtn = document.getElementById('gcSendBtn');
-  const pinnedStrip = document.getElementById('pinnedStrip');
-  const pinnedList = document.getElementById('pinnedList');
-
-  const gcPinInput = document.getElementById('gcPin');
-  gcNameInput.value = localStorage.getItem('gcName') || '';
-  gcPinInput.value = localStorage.getItem('gcPin') || '';
-  gcNameInput.addEventListener('input', () => {
-    localStorage.setItem('gcName', gcNameInput.value);
-    renderGc();
-  });
-  gcPinInput.addEventListener('input', (e) => {
-    e.target.value = e.target.value.replace(/\D/g, '').slice(0,4);
-    localStorage.setItem('gcPin', gcPinInput.value);
-  });
-
-  function scrollGcToBottom(){ gcWindow.scrollTop = gcWindow.scrollHeight; }
-
-  function renderPinnedStrip(){
-    const pinned = gcMsgs.filter(m => m.pinned);
-    if(pinned.length === 0){ pinnedStrip.style.display = 'none'; return; }
-    pinnedStrip.style.display = 'block';
-    pinnedList.innerHTML = pinned.map(m => `
-      <div class="ps-item">
-        <div>
-          <span class="ps-author">${escapeHtml(m.author || 'Anonymous')}</span>
-          <span class="ps-text">${escapeHtml(m.text)}</span>
-        </div>
-        <button class="pin-btn" data-id="${m.id}" data-action="unpin" style="white-space:nowrap;">Alisin</button>
-      </div>
-    `).join('');
-    pinnedList.querySelectorAll('.pin-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.dataset.id;
-        const msg = gcMsgs.find(x => x.id === id);
-        if(!msg) return;
-        if(!isAdmin){
-          const pin = await requestPin('alisin sa pin ang mensahe');
-          if(pin === null) return;
-          if((pin || '').trim() !== (msg.pin || '')){ alert('Maling PIN.'); return; }
-        }
-        try{ await updateDoc(doc(db, 'groupchat', id), { pinned: false }); }
-        catch(e){ alert('Hindi na-update: ' + e.message); }
-      });
-    });
-  }
-
-  function renderGc(){
-    if(gcMsgs.length === 0){
-      gcWindow.innerHTML = '<div class="empty">Simulan ang usapan — walang limitasyon!</div>';
-      renderPinnedStrip();
-      return;
-    }
-    const myName = normName(gcNameInput.value);
-    gcWindow.innerHTML = gcMsgs.map(m => {
-      const mine = myName && normName(m.author) === myName;
-      return `
-        <div class="gc-msg ${mine ? 'me' : ''}" data-id="${m.id}">
-          <p class="gc-author">${escapeHtml(m.author || 'Anonymous')}${m.pinned ? ' 📌' : ''}</p>
-          <p class="gc-text">${escapeHtml(m.text)}</p>
-          <span class="gc-time">${gcFormatTime(m.createdAt)}</span>
-          <div class="gc-admin-row">
-            <button class="pin-btn" data-id="${m.id}" data-action="${m.pinned ? 'unpin' : 'pin'}">${m.pinned ? 'Alisin sa Pin' : 'I-pin'}</button>
-            <button class="delete-btn" data-id="${m.id}" data-action="delete">Tanggalin</button>
-            ${isAdmin ? `<button class="kick-btn" data-author="${escapeHtml(m.author||'')}" data-action="kick">Kick</button>` : ''}
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    gcWindow.querySelectorAll('.pin-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.dataset.id;
-        const msg = gcMsgs.find(x => x.id === id);
-        if(!msg) return;
-        const wantPinned = btn.dataset.action === 'pin';
-        if(!isAdmin){
-          const pin = await requestPin(wantPinned ? 'i-pin ang mensahe' : 'alisin sa pin ang mensahe');
-          if(pin === null) return;
-          if((pin || '').trim() !== (msg.pin || '')){ alert('Maling PIN.'); return; }
-        }
-        try{ await updateDoc(doc(db, 'groupchat', id), { pinned: wantPinned }); }
-        catch(e){ alert('Hindi na-update: ' + e.message); }
-      });
-    });
-    gcWindow.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.dataset.id;
-        const msg = gcMsgs.find(x => x.id === id);
-        if(!msg) return;
-        if(!isAdmin){
-          const pin = await requestPin('tanggalin ang mensahe');
-          if(pin === null) return;
-          if((pin || '').trim() !== (msg.pin || '')){ alert('Maling PIN.'); return; }
-        }else{
-          if(!confirm('Tanggalin ang mensaheng ito?')) return;
-        }
-        try{ await deleteDoc(doc(db, 'groupchat', id)); }
-        catch(e){ alert('Hindi natanggal: ' + e.message); }
-      });
-    });
-    if(isAdmin){
-      gcWindow.querySelectorAll('.kick-btn').forEach(btn => {
-        btn.addEventListener('click', () => kickAuthor(btn.dataset.author, 'gc'));
-      });
-    }
-    renderPinnedStrip();
-    scrollGcToBottom();
-  }
-
-  const gcQuery = query(gcColRef, orderBy('createdAt', 'asc'));
-  onSnapshot(gcQuery, (snap) => {
-    gcMsgs = snap.docs.map(d => {
-      const data = d.data();
-      return {
-        id: d.id, text: data.text, author: data.author, pin: data.pin || '', pinned: !!data.pinned,
-        createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : Date.now()
-      };
-    });
-    renderGc();
-  }, (err) => console.error('Firestore error (groupchat):', err));
-
-  async function sendGcMessage(){
-    const author = gcNameInput.value.trim() || 'Anonymous';
-    const text = gcTextInput.value.trim();
-    const pin = gcPinInput.value.trim();
-    if(bannedSet.has(normName(author))){ alert('Naka-kick ka ng admin — hindi ka na makakapag-chat.'); return; }
-    if(text.length === 0) return;
-    if(!/^\d{4}$/.test(pin)){ alert('Kailangan ng eksaktong 4-digit na PIN (numero lang) bago makapag-send.'); return; }
-    try{
-      await addDoc(gcColRef, { text, author, pin, pinned: false, createdAt: serverTimestamp() });
-      gcTextInput.value = ''; gcTextInput.focus();
-    }catch(e){ alert('Hindi naipadala: ' + e.message); }
-  }
-
-  gcSendBtn.addEventListener('click', sendGcMessage);
-  gcTextInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') sendGcMessage(); });
 </script>
 </body>
 </html>
