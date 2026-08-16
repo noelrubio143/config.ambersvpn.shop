@@ -55,11 +55,11 @@
     padding:4px 10px; border-radius:6px; font-family:inherit; font-size:0.72rem; cursor:pointer;
   }
   .delete-btn:hover{ background:#6b3a3a; color:#fff; }
-  .kick-btn{
-    background:none; border:1px solid #6b4a2a; color:#e09a5f;
+  .copy-btn{
+    background:none; border:1px solid #2f4a3a; color:#5fce9a;
     padding:4px 10px; border-radius:6px; font-family:inherit; font-size:0.72rem; cursor:pointer;
   }
-  .kick-btn:hover{ background:#6b4a2a; color:#fff; }
+  .copy-btn:hover{ background:#2f4a3a; color:#fff; }
   .empty{ color:#8b93a3; text-align:center; padding:40px 20px; font-size:0.9rem; }
   .add-box{ margin-top:22px; background:#262b36; border:1px solid #333a48; border-radius:12px; padding:16px; }
   .add-box label{ display:block; color:#8b93a3; font-size:0.75rem; margin-bottom:8px; }
@@ -104,6 +104,38 @@
     display:inline-block; background:#2f3a2a; color:#8fce5a; font-size:0.65rem;
     padding:2px 7px; border-radius:5px; margin-left:6px; vertical-align:middle;
   }
+  .section-title{
+    color:#e8e9ec; font-size:1rem; font-weight:600; margin:28px 0 12px;
+    display:none; align-items:center; gap:8px;
+  }
+  .client-list{ display:flex; flex-direction:column; gap:12px; }
+  .client-card{
+    background:#262b36; border:1px solid #333a48; border-radius:12px;
+    padding:16px; box-shadow:0 6px 18px rgba(0,0,0,0.3);
+  }
+  .client-card .cname{ color:#5fce9a; font-size:0.9rem; font-weight:600; margin:0 0 8px; word-break:break-word; }
+  .client-card .cconfig{
+    color:#e8e9ec; font-size:0.85rem; line-height:1.5; margin:0 0 10px;
+    white-space:pre-wrap; word-break:break-word; background:#1c1f26; border-radius:8px; padding:10px;
+    max-height:140px; overflow-y:auto; font-family:monospace;
+  }
+  .client-card .ctime{ color:#8b93a3; font-size:0.72rem; margin-bottom:8px; }
+  .client-box{ margin-top:12px; background:#262b36; border:1px solid #333a48; border-radius:12px; padding:16px; display:none; }
+  .client-box label{ display:block; color:#8b93a3; font-size:0.75rem; margin-bottom:8px; }
+  .client-box input[type="text"]{
+    width:100%; background:#1c1f26; border:1px solid #333a48; border-radius:8px;
+    color:#e8e9ec; font-family:inherit; font-size:0.9rem; padding:9px 10px; outline:none; margin-bottom:12px;
+  }
+  .client-box textarea{
+    width:100%; min-height:110px; background:#1c1f26; border:1px solid #333a48; border-radius:8px;
+    color:#e8e9ec; font-family:monospace; font-size:0.85rem; padding:10px; resize:vertical; outline:none;
+  }
+  .client-box .row{ display:flex; align-items:center; justify-content:flex-end; margin-top:10px; }
+  .client-box button{
+    background:#3d7bfd; color:#fff; border:none; border-radius:8px;
+    padding:9px 16px; font-size:0.85rem; cursor:pointer;
+  }
+  .client-box button:hover{ background:#2f68e0; }
 </style>
 </head>
 <body>
@@ -138,12 +170,24 @@
     <div class="row" id="adminBar" style="display:none; margin-top:10px; justify-content:flex-end;">
       <button class="logout-btn" id="logoutBtn">Mag-logout ng Admin</button>
     </div>
+
+    <h2 class="section-title" id="clientsTitle">🔑 Mga Client</h2>
+    <div class="client-list" id="clientList"></div>
+    <div class="client-box" id="clientBox">
+      <label for="clientName">Pangalan ng Client</label>
+      <input type="text" id="clientName" placeholder="hal. Juan Dela Cruz">
+      <label for="clientConfig">Config / Code</label>
+      <textarea id="clientConfig" placeholder="I-paste dito ang config o code ng client..."></textarea>
+      <div class="row">
+        <button id="addClientBtn">Idagdag ang Client</button>
+      </div>
+    </div>
   </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
-    getFirestore, collection, onSnapshot, addDoc, deleteDoc, updateDoc, doc, setDoc, serverTimestamp
+    getFirestore, collection, onSnapshot, addDoc, deleteDoc, updateDoc, doc, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   // 🔧 Palitan ito ng config mula sa iyong Firebase project
@@ -163,10 +207,10 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const colRef = collection(db, 'announcements');
-  const bannedColRef = collection(db, 'banned');
+  const clientsColRef = collection(db, 'clients');
 
   let items = [];
-  let bannedSet = new Set();
+  let clients = [];
 
   function escapeHtml(str){
     const div = document.createElement('div');
@@ -178,7 +222,6 @@
       year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'
     });
   }
-  function normName(n){ return (n || '').trim().toLowerCase(); }
 
   /* ---------- ADMIN LOGIN ---------- */
   function applyAdminUi(){
@@ -187,6 +230,9 @@
     document.getElementById('loginBox').style.display = 'none';
     document.getElementById('adminStatus').style.display = isAdmin ? 'block' : 'none';
     document.getElementById('postBox').style.display = isAdmin ? 'block' : 'none';
+    document.getElementById('clientsTitle').style.display = isAdmin ? 'flex' : 'none';
+    document.getElementById('clientBox').style.display = isAdmin ? 'block' : 'none';
+    document.getElementById('clientList').style.display = isAdmin ? 'flex' : 'none';
   }
   applyAdminUi();
 
@@ -203,7 +249,7 @@
       document.getElementById('adminUser').value = '';
       document.getElementById('adminPass').value = '';
       document.getElementById('loginErr').style.display = 'none';
-      applyAdminUi(); render();
+      applyAdminUi(); render(); renderClients();
     }else{
       document.getElementById('loginErr').style.display = 'block';
     }
@@ -214,28 +260,8 @@
   document.getElementById('logoutBtn').addEventListener('click', () => {
     isAdmin = false;
     sessionStorage.removeItem('announceAdmin');
-    applyAdminUi(); render();
+    applyAdminUi(); render(); renderClients();
   });
-
-  /* ---------- BANNED / KICK ---------- */
-  onSnapshot(bannedColRef, (snap) => {
-    bannedSet = new Set(snap.docs.map(d => d.id));
-  }, (err) => console.error('Firestore error (banned):', err));
-
-  async function kickAuthor(author){
-    if(!isAdmin) return;
-    const name = normName(author);
-    if(!name){ alert('Walang pangalan.'); return; }
-    if(!confirm(`I-kick si "${author}"? Mabablock siyang mag-post, at matatanggal ang lahat ng kanyang mensahe.`)) return;
-    try{
-      await setDoc(doc(db, 'banned', name), { author, bannedAt: serverTimestamp() });
-      const forumDeletes = items.filter(i => normName(i.author) === name).map(i => deleteDoc(doc(db, 'announcements', i.id)));
-      await Promise.all(forumDeletes);
-      alert(`Na-kick si "${author}".`);
-    }catch(e){
-      alert('Hindi na-kick: ' + e.message);
-    }
-  }
 
   /* ---------- FORUM ---------- */
 
@@ -258,13 +284,40 @@
         <div class="card-foot">
           <div class="timestamp">${formatDate(item.updatedAt)}</div>
           <div class="btn-group">
+            <button class="copy-btn" data-id="${item.id}" data-action="copy">📋 Copy</button>
             ${isAdmin ? `<button class="pin-btn" data-id="${item.id}" data-action="pin">${item.pinned ? 'Alisin sa Pin' : 'I-pin'}</button>` : ''}
             ${isAdmin ? `<button class="delete-btn" data-id="${item.id}" data-action="delete">Tanggalin</button>` : ''}
-            ${isAdmin ? `<button class="kick-btn" data-author="${escapeHtml(item.author||'')}" data-action="kick">Kick</button>` : ''}
           </div>
         </div>
       </div>
     `).join('');
+
+    listEl.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const item = items.find(i => i.id === id);
+        if(!item) return;
+        try{
+          if(navigator.clipboard && window.isSecureContext){
+            await navigator.clipboard.writeText(item.text);
+          }else{
+            const ta = document.createElement('textarea');
+            ta.value = item.text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+          }
+          const original = btn.textContent;
+          btn.textContent = '✅ Nakopya';
+          setTimeout(() => { btn.textContent = original; }, 1500);
+        }catch(e){
+          alert('Hindi nakopya: ' + e.message);
+        }
+      });
+    });
 
     listEl.querySelectorAll('.pin-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -291,9 +344,6 @@
       });
     });
 
-    listEl.querySelectorAll('.kick-btn').forEach(btn => {
-      btn.addEventListener('click', () => kickAuthor(btn.dataset.author));
-    });
   }
 
   onSnapshot(colRef, (snap) => {
@@ -332,6 +382,83 @@
 
   document.getElementById('newMsg').addEventListener('keydown', (e) => {
     if(e.key === 'Enter' && (e.metaKey || e.ctrlKey)) document.getElementById('addBtn').click();
+  });
+
+  /* ---------- CLIENTS (admin only, unlimited) ---------- */
+  function renderClients(){
+    const listEl = document.getElementById('clientList');
+    if(!isAdmin){ listEl.innerHTML = ''; return; }
+    if(clients.length === 0){
+      listEl.innerHTML = '<div class="empty">Wala pang client. Magdagdag sa ibaba.</div>';
+      return;
+    }
+    const sorted = [...clients].sort((a,b) => b.createdAt - a.createdAt);
+    listEl.innerHTML = sorted.map(c => `
+      <div class="client-card" data-id="${c.id}">
+        <p class="cname">👤 ${escapeHtml(c.name)}</p>
+        <div class="ctime">${formatDate(c.createdAt)}</div>
+        <div class="cconfig">${escapeHtml(c.config)}</div>
+        <div class="btn-group">
+          <button class="copy-btn" data-id="${c.id}" data-action="copy-client">📋 Copy Config</button>
+          <button class="delete-btn" data-id="${c.id}" data-action="delete-client">Tanggalin</button>
+        </div>
+      </div>
+    `).join('');
+
+    listEl.querySelectorAll('[data-action="copy-client"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const c = clients.find(x => x.id === btn.dataset.id);
+        if(!c) return;
+        try{
+          if(navigator.clipboard && window.isSecureContext){
+            await navigator.clipboard.writeText(c.config);
+          }else{
+            const ta = document.createElement('textarea');
+            ta.value = c.config;
+            ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+          }
+          const original = btn.textContent;
+          btn.textContent = '✅ Nakopya';
+          setTimeout(() => { btn.textContent = original; }, 1500);
+        }catch(e){ alert('Hindi nakopya: ' + e.message); }
+      });
+    });
+
+    listEl.querySelectorAll('[data-action="delete-client"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if(!isAdmin) return;
+        if(!confirm('Tanggalin ang client na ito?')) return;
+        try{ await deleteDoc(doc(db, 'clients', btn.dataset.id)); }
+        catch(e){ alert('Hindi natanggal: ' + e.message); }
+      });
+    });
+  }
+
+  onSnapshot(clientsColRef, (snap) => {
+    clients = snap.docs.map(d => {
+      const data = d.data();
+      return {
+        id: d.id, name: data.name, config: data.config,
+        createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : Date.now()
+      };
+    });
+    renderClients();
+  }, (err) => console.error('Firestore error (clients):', err));
+
+  document.getElementById('addClientBtn').addEventListener('click', async () => {
+    if(!isAdmin){ alert('Admin lang ang makakagawa ng client.'); return; }
+    const nameInput = document.getElementById('clientName');
+    const configInput = document.getElementById('clientConfig');
+    const name = nameInput.value.trim();
+    const config = configInput.value.trim();
+    if(name.length === 0 || config.length === 0){ alert('Kailangan ng pangalan at config.'); return; }
+    try{
+      await addDoc(clientsColRef, { name, config, createdAt: serverTimestamp() });
+      nameInput.value = ''; configInput.value = '';
+    }catch(e){ alert('Hindi naidagdag: ' + e.message); }
   });
 </script>
 </body>
