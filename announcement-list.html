@@ -137,36 +137,31 @@
     </div>
   </div>
 
-<script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore, collection, onSnapshot,
+    addDoc, deleteDoc, doc, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // 🔧 Palitan ito ng config mula sa iyong Firebase project
+  // (Firebase console > Project settings > Your apps > SDK setup and configuration)
+  const firebaseConfig = {
+    apiKey: "AIzaSyDvbz3f2biSJ344LgxyM1hA8SguUgtiMKg",
+    authDomain: "ambervpn-c7814.firebaseapp.com",
+    projectId: "ambervpn-c7814",
+    storageBucket: "ambervpn-c7814.firebasestorage.app",
+    messagingSenderId: "735042751832",
+    appId: "1:735042751832:web:fe556f28817f09f331e92d"
+  };
+
   const REMOTE_URL = 'https://config.ambersvpn.shop/announcements.json';
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const colRef = collection(db, 'announcements');
+
   let items = [];
-
-  async function loadItems(){
-    try{
-      const result = await window.storage.get('announcements-list');
-      items = result ? JSON.parse(result.value) : null;
-    }catch(e){
-      items = null;
-    }
-    if(!items){
-      items = [];
-    }
-    render();
-    // laging subukang i-refresh mula sa remote URL pagbukas ng page
-    await loadFromUrl(REMOTE_URL, true);
-  }
-
-  async function saveItems(){
-    try{
-      await window.storage.set('announcements-list', JSON.stringify(items));
-    }catch(e){
-      console.error('Hindi na-save', e);
-    }
-  }
-
-  function genId(){
-    return 'a_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
-  }
 
   function formatDate(ts){
     return new Date(ts).toLocaleString('fil-PH', {
@@ -200,12 +195,29 @@
 
     listEl.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
-        items = items.filter(i => i.id !== btn.dataset.id);
-        await saveItems();
-        render();
+        try{
+          await deleteDoc(doc(db, 'announcements', btn.dataset.id));
+        }catch(e){
+          alert('Hindi natanggal: ' + e.message);
+        }
       });
     });
   }
+
+  // Live sync: awtomatikong nag-a-update ang view kapag may pagbabago sa Firestore
+  onSnapshot(colRef, (snap) => {
+    items = snap.docs.map(d => {
+      const data = d.data();
+      return {
+        id: d.id,
+        text: data.text,
+        updatedAt: data.updatedAt?.toMillis ? data.updatedAt.toMillis() : Date.now()
+      };
+    });
+    render();
+  }, (err) => {
+    console.error('Firestore error:', err);
+  });
 
   function updateCountHint(){
     const raw = document.getElementById('newMsg').value;
@@ -225,33 +237,27 @@
     }
   }
 
-  async function loadFromUrl(url, silent){
+  async function loadFromUrl(url){
     const addBtn = document.getElementById('addBtn');
-    if(!silent){
-      addBtn.disabled = true;
-      addBtn.textContent = 'Kinukuha...';
-    }
+    addBtn.disabled = true;
+    addBtn.textContent = 'Kinukuha...';
     try{
       const res = await fetch(url);
       if(!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       if(!Array.isArray(data)) throw new Error('Hindi array ang laman');
 
-      items = data.map(entry => ({
-        id: entry.id ? String(entry.id) : genId(),
-        text: String(entry.text ?? ''),
-        updatedAt: typeof entry.updatedAt === 'number' ? entry.updatedAt : Date.now()
-      }));
-
-      await saveItems();
-      render();
-    }catch(e){
-      if(!silent) alert('Hindi nakuha ang laman ng link: ' + e.message);
-    }finally{
-      if(!silent){
-        addBtn.disabled = false;
-        addBtn.textContent = 'Idagdag';
+      for(const entry of data){
+        await addDoc(colRef, {
+          text: String(entry.text ?? ''),
+          updatedAt: serverTimestamp()
+        });
       }
+    }catch(e){
+      alert('Hindi nakuha ang laman ng link: ' + e.message);
+    }finally{
+      addBtn.disabled = false;
+      addBtn.textContent = 'Idagdag';
     }
   }
 
@@ -260,7 +266,6 @@
     const raw = textarea.value.trim();
 
     if(raw === ''){
-      // walang laman ang box -> mag-refresh mula sa naka-embed na remote URL
       await loadFromUrl(REMOTE_URL);
       return;
     }
@@ -275,22 +280,19 @@
     const lines = textarea.value.split('\n').map(l => l.trim()).filter(Boolean);
     if(lines.length === 0) return;
 
-    const now = Date.now();
-    lines.forEach((line, i) => {
-      items.push({
-        id: genId(),
-        text: line,
-        updatedAt: now + i
-      });
-    });
-
-    textarea.value = '';
-    updateCountHint();
-    await saveItems();
-    render();
+    try{
+      for(const line of lines){
+        await addDoc(colRef, {
+          text: line,
+          updatedAt: serverTimestamp()
+        });
+      }
+      textarea.value = '';
+      updateCountHint();
+    }catch(e){
+      alert('Hindi naidagdag: ' + e.message);
+    }
   });
-
-  loadItems();
 </script>
 </body>
 </html>
