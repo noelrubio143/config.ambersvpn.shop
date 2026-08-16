@@ -138,6 +138,7 @@
   </div>
 
 <script>
+  const REMOTE_URL = 'https://config.ambersvpn.shop/announcements.json';
   let items = [];
 
   async function loadItems(){
@@ -148,16 +149,11 @@
       items = null;
     }
     if(!items){
-      items = [
-        {
-          id: '32a7ec5c-c7a9-4334-ad2f-5635edcf8622',
-          text: 'hi everyone mag uupdate muna ako ng apps parang may problema ang add time',
-          updatedAt: 1786878611338
-        }
-      ];
-      await saveItems();
+      items = [];
     }
     render();
+    // laging subukang i-refresh mula sa remote URL pagbukas ng page
+    await loadFromUrl(REMOTE_URL, true);
   }
 
   async function saveItems(){
@@ -229,10 +225,12 @@
     }
   }
 
-  async function loadFromUrl(url){
+  async function loadFromUrl(url, silent){
     const addBtn = document.getElementById('addBtn');
-    addBtn.disabled = true;
-    addBtn.textContent = 'Kinukuha...';
+    if(!silent){
+      addBtn.disabled = true;
+      addBtn.textContent = 'Kinukuha...';
+    }
     try{
       const res = await fetch(url);
       if(!res.ok) throw new Error('HTTP ' + res.status);
@@ -248,16 +246,24 @@
       await saveItems();
       render();
     }catch(e){
-      alert('Hindi nakuha ang laman ng link: ' + e.message);
+      if(!silent) alert('Hindi nakuha ang laman ng link: ' + e.message);
     }finally{
-      addBtn.disabled = false;
-      addBtn.textContent = 'Idagdag';
+      if(!silent){
+        addBtn.disabled = false;
+        addBtn.textContent = 'Idagdag';
+      }
     }
   }
 
   document.getElementById('addBtn').addEventListener('click', async () => {
     const textarea = document.getElementById('newMsg');
     const raw = textarea.value.trim();
+
+    if(raw === ''){
+      // walang laman ang box -> mag-refresh mula sa naka-embed na remote URL
+      await loadFromUrl(REMOTE_URL);
+      return;
+    }
 
     if(isUrl(raw)){
       await loadFromUrl(raw);
