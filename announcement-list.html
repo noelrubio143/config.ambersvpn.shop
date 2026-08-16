@@ -198,7 +198,7 @@
 
     <div class="add-box" id="addBox" style="display:none;">
       <label for="newMsg">Magdagdag ng tala — isang linya, isang tala (pwedeng maramihan)</label>
-      <textarea id="newMsg" placeholder="hal.&#10;Unang announcement&#10;Pangalawang announcement&#10;Pangatlong announcement&#10;&#10;(o mag-paste ng link sa .json para i-load lahat)"></textarea>
+      <textarea id="newMsg"></textarea>
       <div class="row">
         <span class="hint" id="countHint"></span>
         <button id="addBtn">Idagdag</button>
@@ -241,13 +241,6 @@
     appId: "1:735042751832:web:fe556f28817f09f331e92d"
   };
 
-  const REMOTE_URL = 'https://config.ambersvpn.shop/announcements.json';
-
-  // Simple client-side admin gate. This only hides/shows the add & delete
-  // controls in this page's UI - it is not real server-side security (the
-  // actual write protection has to come from the Firestore rules on the
-  // ambervpn-c7814 project). Its purpose here is just to stop casual
-  // visitors from editing announcements by accident or on a whim.
   const ADMIN_USER = 'ambervpn';
   const ADMIN_PASS = '@Noelrubio12011990';
   let isAdmin = sessionStorage.getItem('announceAdmin') === '1';
@@ -365,56 +358,9 @@
 
   document.getElementById('newMsg').addEventListener('input', updateCountHint);
 
-  function isUrl(str){
-    try{
-      const u = new URL(str);
-      return u.protocol === 'http:' || u.protocol === 'https:';
-    }catch(e){
-      return false;
-    }
-  }
-
-  async function loadFromUrl(url){
-    const addBtn = document.getElementById('addBtn');
-    addBtn.disabled = true;
-    addBtn.textContent = 'Kinukuha...';
-    try{
-      const res = await fetch(url);
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      if(!Array.isArray(data)) throw new Error('Hindi array ang laman');
-
-      for(const entry of data){
-        await addDoc(colRef, {
-          text: String(entry.text ?? ''),
-          updatedAt: serverTimestamp()
-        });
-      }
-    }catch(e){
-      alert('Hindi nakuha ang laman ng link: ' + e.message);
-    }finally{
-      addBtn.disabled = false;
-      addBtn.textContent = 'Idagdag';
-    }
-  }
-
   document.getElementById('addBtn').addEventListener('click', async () => {
     if(!isAdmin) return;
     const textarea = document.getElementById('newMsg');
-    const raw = textarea.value.trim();
-
-    if(raw === ''){
-      await loadFromUrl(REMOTE_URL);
-      return;
-    }
-
-    if(isUrl(raw)){
-      await loadFromUrl(raw);
-      textarea.value = '';
-      updateCountHint();
-      return;
-    }
-
     const lines = textarea.value.split('\n').map(l => l.trim()).filter(Boolean);
     if(lines.length === 0) return;
 
