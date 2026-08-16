@@ -115,7 +115,7 @@
 
     <div class="list" id="list"></div>
 
-    <div class="add-box" id="postBox">
+    <div class="add-box" id="postBox" style="display:none;">
       <label for="postName">Pangalan / Username</label>
       <input type="text" id="postName" placeholder="Ilagay ang iyong pangalan">
       <label for="newMsg">Mensahe</label>
@@ -191,6 +191,7 @@
     document.getElementById('adminBar').style.display = isAdmin ? 'flex' : 'none';
     document.getElementById('loginBox').style.display = 'none';
     document.getElementById('adminStatus').style.display = isAdmin ? 'block' : 'none';
+    document.getElementById('postBox').style.display = isAdmin ? 'block' : 'none';
   }
   applyAdminUi();
 
@@ -335,6 +336,7 @@
   });
 
   document.getElementById('addBtn').addEventListener('click', async () => {
+    if(!isAdmin){ alert('Admin lang ang makakapag-post sa forum na ito.'); return; }
     const nameInput = document.getElementById('postName');
     const textarea = document.getElementById('newMsg');
     const pinInput = document.getElementById('postPin');
