@@ -129,7 +129,7 @@
 
     <div class="add-box">
       <label for="newMsg">Magdagdag ng tala — isang linya, isang tala (pwedeng maramihan)</label>
-      <textarea id="newMsg" placeholder="hal.&#10;Unang announcement&#10;Pangalawang announcement&#10;Pangatlong announcement"></textarea>
+      <textarea id="newMsg" placeholder="hal.&#10;Unang announcement&#10;Pangalawang announcement&#10;Pangatlong announcement&#10;&#10;(o mag-paste ng link sa .json para i-load lahat)"></textarea>
       <div class="row">
         <span class="hint" id="countHint"></span>
         <button id="addBtn">Idagdag</button>
@@ -220,8 +220,52 @@
 
   document.getElementById('newMsg').addEventListener('input', updateCountHint);
 
+  function isUrl(str){
+    try{
+      const u = new URL(str);
+      return u.protocol === 'http:' || u.protocol === 'https:';
+    }catch(e){
+      return false;
+    }
+  }
+
+  async function loadFromUrl(url){
+    const addBtn = document.getElementById('addBtn');
+    addBtn.disabled = true;
+    addBtn.textContent = 'Kinukuha...';
+    try{
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      if(!Array.isArray(data)) throw new Error('Hindi array ang laman');
+
+      items = data.map(entry => ({
+        id: entry.id ? String(entry.id) : genId(),
+        text: String(entry.text ?? ''),
+        updatedAt: typeof entry.updatedAt === 'number' ? entry.updatedAt : Date.now()
+      }));
+
+      await saveItems();
+      render();
+    }catch(e){
+      alert('Hindi nakuha ang laman ng link: ' + e.message);
+    }finally{
+      addBtn.disabled = false;
+      addBtn.textContent = 'Idagdag';
+    }
+  }
+
   document.getElementById('addBtn').addEventListener('click', async () => {
     const textarea = document.getElementById('newMsg');
+    const raw = textarea.value.trim();
+
+    if(isUrl(raw)){
+      await loadFromUrl(raw);
+      textarea.value = '';
+      updateCountHint();
+      return;
+    }
+
     const lines = textarea.value.split('\n').map(l => l.trim()).filter(Boolean);
     if(lines.length === 0) return;
 
