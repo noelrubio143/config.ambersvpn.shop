@@ -1,18 +1,15 @@
 [
   {
     "authType": "password",
-    "connectionType": "ssl_payload_proxy_ws",
-    "group": "DITO",
+    "connectionType": "direct",
+    "group": "VLESS",
     "host": "ph8gb.ambersvpn.shop",
     "hostSource": "cf",
-    "id": "d655acb3-4b44-4899-b3a0-9969e68a445e",
+    "id": "9f8d5aa0-cf91-4989-8e40-211f36232b6d",
     "name": "UNLISOCIAL",
-    "password": "1",
-    "payload": "GET / HTTP/1.1[crlf]Host: ph8gb.ambersvpn.shop[crlf]Upgrade: websocket[crlf][crlf]",
+    "notes": "vless://fa9c83d6-8f42-4a51-8bfc-a28e16575fab@api24-normal.tiktokv.com:443?encryption\u003dnone\u0026type\u003dws\u0026host\u003dph8gb.ambersvpn.shop\u0026headerType\u003dnone\u0026path\u003d%2Fvless\u0026security\u003dtls#unlitiktok",
+    "password": "ph8gb.ambersvpn.shop",
     "port": 443,
-    "proxyHost": "api24-normal.tiktokv.com",
-    "proxyPort": "443",
-    "sni": "tiktok.ambersvpn.shop",
-    "username": "1"
+    "username": "ph8gb.ambersvpn.shop"
   }
 ]
