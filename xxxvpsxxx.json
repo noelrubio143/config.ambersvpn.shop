@@ -98,6 +98,22 @@
   {
     "authType": "password",
     "connectionType": "ssl_payload_proxy_ws",
+    "group": "UNLIDATA BYPASS",
+    "host": "ph8gb.ambersvpn.shop",
+    "hostSource": "cf",
+    "id": "6f69b136-1a53-4b8d-8ddf-a7d309b8d7f0",
+    "name": "UNLIDATA BYPASS PH HIGH SPEED",
+    "password": "1",
+    "payload": "GET / HTTP/1.1[crlf]Host: www.opensignal.com[crlf]Upgrade: websocket[crlf][crlf]",
+    "port": 443,
+    "proxyHost": "ph8gb.ambersvpn.shop",
+    "proxyPort": "443",
+    "sni": "www.opensignal.com",
+    "username": "1"
+  },
+  {
+    "authType": "password",
+    "connectionType": "ssl_payload_proxy_ws",
     "group": "GLOBE",
     "host": "ph8gb.ambersvpn.shop",
     "hostSource": "cf",
