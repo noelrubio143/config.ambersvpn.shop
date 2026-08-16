@@ -1,6 +1,22 @@
 [
   {
     "authType": "password",
+    "connectionType": "ssl_payload_proxy_ws",
+    "group": "UNLISOCIAL PH SSH",
+    "host": "ph8gb.ambersvpn.shop",
+    "hostSource": "cf",
+    "id": "dd509007-f6c2-481d-b96a-849e6f85347d",
+    "name": "PH HIGH SPEED",
+    "password": "1",
+    "payload": "GET / HTTP/1.1[crlf]Host: ph8gb.ambersvpn.shop[crlf]Upgrade: websocket[crlf][crlf]",
+    "port": 443,
+    "proxyHost": "api24-normal.tiktokv.com",
+    "proxyPort": "443",
+    "sni": "tiktok.ambersvpn.shop",
+    "username": "1"
+  },
+  {
+    "authType": "password",
     "connectionType": "direct",
     "group": "General",
     "host": "UNLISOCIAL",
