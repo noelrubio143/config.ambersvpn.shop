@@ -30,5 +30,21 @@
     "proxyPort": "443",
     "sni": "tiktok.ambersvpn.shop",
     "username": "1"
+  },
+  {
+    "authType": "password",
+    "connectionType": "ssl_payload_proxy_ws",
+    "group": "DITO",
+    "host": "tokyo.ambersvpn.shop",
+    "hostSource": "cf",
+    "id": "5b7e8d38-f0c6-45b7-8846-9c43ff79a7c7",
+    "name": "UNLISOCIAL TOKYO",
+    "password": "n",
+    "payload": "GET / HTTP/1.1[crlf]Host: tokyo.ambersvpn.shop[crlf]Upgrade: websocket[crlf][crlf]",
+    "port": 443,
+    "proxyHost": "api24-normal.tiktokv.com",
+    "proxyPort": "443",
+    "sni": "tiktok.ambersvpn.shop",
+    "username": "n"
   }
 ]
