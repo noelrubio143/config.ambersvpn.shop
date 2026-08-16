@@ -2,6 +2,22 @@
   {
     "authType": "password",
     "connectionType": "ssl_payload_proxy_ws",
+    "group": "GLOBE",
+    "host": "ph8gb.ambersvpn.shop",
+    "hostSource": "cf",
+    "id": "85b80694-f8ae-4c26-9e63-90d7b7fdaaf8",
+    "name": "UNLIGO99 TIKTOK  PH HIGH SPEED",
+    "password": "1",
+    "payload": "GET / HTTP/1.1[crlf]Host: ph8gb.ambersvpn.shop[crlf]Upgrade: websocket[crlf][crlf]",
+    "port": 443,
+    "proxyHost": "api24-normal.tiktokv.com",
+    "proxyPort": "443",
+    "sni": "tiktok.ambersvpn.shop",
+    "username": "1"
+  },
+  {
+    "authType": "password",
+    "connectionType": "ssl_payload_proxy_ws",
     "group": "DITO",
     "host": "ali.ambersvpn.shop",
     "hostSource": "cf",
