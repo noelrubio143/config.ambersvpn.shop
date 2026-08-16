@@ -5,7 +5,7 @@
     "group": "DITO",
     "host": "ph8gb.ambersvpn.shop",
     "hostSource": "cf",
-    "id": "b349946c-8620-4d95-a2fe-28547203675b",
+    "id": "2895ab9e-7195-4791-8918-fd0db4176cb3",
     "name": "UNLISOCIAL PH HIGH SPEED",
     "password": "1",
     "payload": "GET / HTTP/1.1[crlf]Host: ph8gb.ambersvpn.shop[crlf]Upgrade: websocket[crlf][crlf]",
