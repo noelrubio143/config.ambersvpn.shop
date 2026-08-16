@@ -7,13 +7,13 @@
     "hostSource": "cf",
     "id": "41045545-85b1-46cd-88f1-a1198c5ba18d",
     "name": "UNLISOCIAL",
-    "password": "ambervpn",
+    "password": "n",
     "payload": "GET / HTTP/1.1[crlf]Host: ali.ambersvpn.shop[crlf]Upgrade: websocket[crlf][crlf]",
     "port": 443,
     "proxyHost": "api24-normal.tiktokv.com",
     "proxyPort": "443",
     "sni": "tiktok.ambersvpn.shop",
-    "username": "ambervpn"
+    "username": "n"
   },
   {
     "authType": "password",
