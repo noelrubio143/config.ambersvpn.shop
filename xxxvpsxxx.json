@@ -114,6 +114,22 @@
   {
     "authType": "password",
     "connectionType": "ssl_payload_proxy_ws",
+    "group": "UNLIDATA BYPASS",
+    "host": "tokyo.ambersvpn.shop",
+    "hostSource": "cf",
+    "id": "7acba224-4003-4ec6-a497-dae69082e706",
+    "name": "UNLIDATA BYPASS TOKYO",
+    "password": "n",
+    "payload": "GET / HTTP/1.1[crlf]Host: www.opensignal.com[crlf]Upgrade: websocket[crlf][crlf]",
+    "port": 443,
+    "proxyHost": "tokyo.ambersvpn.shop",
+    "proxyPort": "443",
+    "sni": "www.opensignal.com",
+    "username": "n"
+  },
+  {
+    "authType": "password",
+    "connectionType": "ssl_payload_proxy_ws",
     "group": "GLOBE",
     "host": "ph8gb.ambersvpn.shop",
     "hostSource": "cf",
