@@ -104,38 +104,6 @@
     display:inline-block; background:#2f3a2a; color:#8fce5a; font-size:0.65rem;
     padding:2px 7px; border-radius:5px; margin-left:6px; vertical-align:middle;
   }
-  .section-title{
-    color:#e8e9ec; font-size:1rem; font-weight:600; margin:28px 0 12px;
-    display:none; align-items:center; gap:8px;
-  }
-  .client-list{ display:flex; flex-direction:column; gap:12px; }
-  .client-card{
-    background:#262b36; border:1px solid #333a48; border-radius:12px;
-    padding:16px; box-shadow:0 6px 18px rgba(0,0,0,0.3);
-  }
-  .client-card .cname{ color:#5fce9a; font-size:0.9rem; font-weight:600; margin:0 0 8px; word-break:break-word; }
-  .client-card .cconfig{
-    color:#e8e9ec; font-size:0.85rem; line-height:1.5; margin:0 0 10px;
-    white-space:pre-wrap; word-break:break-word; background:#1c1f26; border-radius:8px; padding:10px;
-    max-height:140px; overflow-y:auto; font-family:monospace;
-  }
-  .client-card .ctime{ color:#8b93a3; font-size:0.72rem; margin-bottom:8px; }
-  .client-box{ margin-top:12px; background:#262b36; border:1px solid #333a48; border-radius:12px; padding:16px; display:none; }
-  .client-box label{ display:block; color:#8b93a3; font-size:0.75rem; margin-bottom:8px; }
-  .client-box input[type="text"]{
-    width:100%; background:#1c1f26; border:1px solid #333a48; border-radius:8px;
-    color:#e8e9ec; font-family:inherit; font-size:0.9rem; padding:9px 10px; outline:none; margin-bottom:12px;
-  }
-  .client-box textarea{
-    width:100%; min-height:110px; background:#1c1f26; border:1px solid #333a48; border-radius:8px;
-    color:#e8e9ec; font-family:monospace; font-size:0.85rem; padding:10px; resize:vertical; outline:none;
-  }
-  .client-box .row{ display:flex; align-items:center; justify-content:flex-end; margin-top:10px; }
-  .client-box button{
-    background:#3d7bfd; color:#fff; border:none; border-radius:8px;
-    padding:9px 16px; font-size:0.85rem; cursor:pointer;
-  }
-  .client-box button:hover{ background:#2f68e0; }
 </style>
 </head>
 <body>
@@ -170,18 +138,6 @@
     <div class="row" id="adminBar" style="display:none; margin-top:10px; justify-content:flex-end;">
       <button class="logout-btn" id="logoutBtn">Mag-logout ng Admin</button>
     </div>
-
-    <h2 class="section-title" id="clientsTitle">🔑 Mga Client</h2>
-    <div class="client-list" id="clientList"></div>
-    <div class="client-box" id="clientBox">
-      <label for="clientName">Pangalan ng Client</label>
-      <input type="text" id="clientName" placeholder="hal. Juan Dela Cruz">
-      <label for="clientConfig">Config / Code</label>
-      <textarea id="clientConfig" placeholder="I-paste dito ang config o code ng client..."></textarea>
-      <div class="row">
-        <button id="addClientBtn">Idagdag ang Client</button>
-      </div>
-    </div>
   </div>
 
 <script type="module">
@@ -207,10 +163,8 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const colRef = collection(db, 'announcements');
-  const clientsColRef = collection(db, 'clients');
 
   let items = [];
-  let clients = [];
 
   function escapeHtml(str){
     const div = document.createElement('div');
@@ -230,9 +184,6 @@
     document.getElementById('loginBox').style.display = 'none';
     document.getElementById('adminStatus').style.display = isAdmin ? 'block' : 'none';
     document.getElementById('postBox').style.display = isAdmin ? 'block' : 'none';
-    document.getElementById('clientsTitle').style.display = isAdmin ? 'flex' : 'none';
-    document.getElementById('clientBox').style.display = isAdmin ? 'block' : 'none';
-    document.getElementById('clientList').style.display = isAdmin ? 'flex' : 'none';
   }
   applyAdminUi();
 
@@ -249,7 +200,7 @@
       document.getElementById('adminUser').value = '';
       document.getElementById('adminPass').value = '';
       document.getElementById('loginErr').style.display = 'none';
-      applyAdminUi(); render(); renderClients();
+      applyAdminUi(); render();
     }else{
       document.getElementById('loginErr').style.display = 'block';
     }
@@ -260,7 +211,7 @@
   document.getElementById('logoutBtn').addEventListener('click', () => {
     isAdmin = false;
     sessionStorage.removeItem('announceAdmin');
-    applyAdminUi(); render(); renderClients();
+    applyAdminUi(); render();
   });
 
   /* ---------- FORUM ---------- */
