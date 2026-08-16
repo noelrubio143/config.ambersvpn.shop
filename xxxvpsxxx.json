@@ -18,6 +18,22 @@
   {
     "authType": "password",
     "connectionType": "ssl_payload_proxy_ws",
+    "group": "SMART",
+    "host": "tokyo.ambersvpn.shop",
+    "hostSource": "cf",
+    "id": "19084fd2-4893-4228-9e58-ab590fc0e95f",
+    "name": "POWER ALL TIKTOK TOKYO",
+    "password": "n",
+    "payload": "GET / HTTP/1.1[crlf]Host: tokyo.ambersvpn.shop[crlf]Upgrade: websocket[crlf][crlf]",
+    "port": 443,
+    "proxyHost": "api24-normal.tiktokv.com",
+    "proxyPort": "443",
+    "sni": "tiktok.ambersvpn.shop",
+    "username": "n"
+  },
+  {
+    "authType": "password",
+    "connectionType": "ssl_payload_proxy_ws",
     "group": "GLOBE",
     "host": "ph8gb.ambersvpn.shop",
     "hostSource": "cf",
