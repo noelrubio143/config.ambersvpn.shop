@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mga Announcement</title>
+<style>
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:#1c1f26;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding:30px 16px;
+  }
+  .wrap{
+    max-width:520px;
+    margin:0 auto;
+  }
+  h1{
+    color:#e8e9ec;
+    font-size:1.3rem;
+    margin:0 0 18px;
+    text-align:center;
+  }
+  .list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .card{
+    background:#262b36;
+    border:1px solid #333a48;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.3);
+  }
+  .card .icon{
+    font-size:1.3rem;
+    margin-bottom:10px;
+  }
+  .card .message{
+    color:#e8e9ec;
+    font-size:1rem;
+    line-height:1.6;
+    margin:0 0 10px;
+    white-space:pre-wrap;
+  }
+  .card .timestamp{
+    color:#8b93a3;
+    font-size:0.75rem;
+    letter-spacing:0.3px;
+  }
+  .card .card-foot{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:10px;
+  }
+  .card .delete-btn{
+    background:none;
+    border:1px solid #6b3a3a;
+    color:#e0765f;
+    padding:4px 10px;
+    border-radius:6px;
+    font-family:inherit;
+    font-size:0.72rem;
+    cursor:pointer;
+  }
+  .card .delete-btn:hover{ background:#6b3a3a; color:#fff; }
+  .empty{
+    color:#8b93a3;
+    text-align:center;
+    padding:40px 20px;
+    font-size:0.9rem;
+  }
+  .add-box{
+    margin-top:22px;
+    background:#262b36;
+    border:1px solid #333a48;
+    border-radius:12px;
+    padding:16px;
+  }
+  .add-box label{
+    display:block;
+    color:#8b93a3;
+    font-size:0.75rem;
+    margin-bottom:8px;
+  }
+  .add-box textarea{
+    width:100%;
+    min-height:90px;
+    background:#1c1f26;
+    border:1px solid #333a48;
+    border-radius:8px;
+    color:#e8e9ec;
+    font-family:inherit;
+    font-size:0.9rem;
+    padding:10px;
+    resize:vertical;
+    outline:none;
+  }
+  .add-box .row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:10px;
+  }
+  .add-box .hint{
+    color:#6b7383;
+    font-size:0.72rem;
+  }
+  .add-box button{
+    background:#3d7bfd;
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:9px 16px;
+    font-size:0.85rem;
+    cursor:pointer;
+  }
+  .add-box button:hover{ background:#2f68e0; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>📢 Mga Announcement</h1>
+    <div class="list" id="list"></div>
+
+    <div class="add-box">
+      <label for="newMsg">Magdagdag ng tala — isang linya, isang tala (pwedeng maramihan)</label>
+      <textarea id="newMsg" placeholder="hal.&#10;Unang announcement&#10;Pangalawang announcement&#10;Pangatlong announcement"></textarea>
+      <div class="row">
+        <span class="hint" id="countHint"></span>
+        <button id="addBtn">Idagdag</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  let items = [];
+
+  async function loadItems(){
+    try{
+      const result = await window.storage.get('announcements-list');
+      items = result ? JSON.parse(result.value) : null;
+    }catch(e){
+      items = null;
+    }
+    if(!items){
+      items = [
+        {
+          id: '32a7ec5c-c7a9-4334-ad2f-5635edcf8622',
+          text: 'hi everyone mag uupdate muna ako ng apps parang may problema ang add time',
+          updatedAt: 1786878611338
+        }
+      ];
+      await saveItems();
+    }
+    render();
+  }
+
+  async function saveItems(){
+    try{
+      await window.storage.set('announcements-list', JSON.stringify(items));
+    }catch(e){
+      console.error('Hindi na-save', e);
+    }
+  }
+
+  function genId(){
+    return 'a_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+  }
+
+  function formatDate(ts){
+    return new Date(ts).toLocaleString('fil-PH', {
+      year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'
+    });
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function render(){
+    const listEl = document.getElementById('list');
+    if(items.length === 0){
+      listEl.innerHTML = '<div class="empty">Wala pang announcement.</div>';
+      return;
+    }
+    const sorted = [...items].sort((a,b)=> b.updatedAt - a.updatedAt);
+    listEl.innerHTML = sorted.map(item => `
+      <div class="card">
+        <div class="icon">📢</div>
+        <p class="message">${escapeHtml(item.text)}</p>
+        <div class="card-foot">
+          <div class="timestamp">Updated: ${formatDate(item.updatedAt)}</div>
+          <button class="delete-btn" data-id="${item.id}">Tanggalin</button>
+        </div>
+      </div>
+    `).join('');
+
+    listEl.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        items = items.filter(i => i.id !== btn.dataset.id);
+        await saveItems();
+        render();
+      });
+    });
+  }
+
+  function updateCountHint(){
+    const raw = document.getElementById('newMsg').value;
+    const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+    const hint = document.getElementById('countHint');
+    hint.textContent = lines.length > 0 ? (lines.length + (lines.length === 1 ? ' tala' : ' na tala')) : '';
+  }
+
+  document.getElementById('newMsg').addEventListener('input', updateCountHint);
+
+  document.getElementById('addBtn').addEventListener('click', async () => {
+    const textarea = document.getElementById('newMsg');
+    const lines = textarea.value.split('\n').map(l => l.trim()).filter(Boolean);
+    if(lines.length === 0) return;
+
+    const now = Date.now();
+    lines.forEach((line, i) => {
+      items.push({
+        id: genId(),
+        text: line,
+        updatedAt: now + i
+      });
+    });
+
+    textarea.value = '';
+    updateCountHint();
+    await saveItems();
+    render();
+  });
+
+  loadItems();
+</script>
+</body>
+</html>
