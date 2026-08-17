@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account Portal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --ink:#1a1a2e;
+    --bg:#f0f2f8;
+    --card:#ffffff;
+    --accent:#4f5bd5;
+    --accent2:#00c2a8;
+    --danger:#e6484f;
+    --line:#dde1ee;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(79,91,213,0.10), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(0,194,168,0.10), transparent 40%),
+      var(--bg);
+    font-family:'Space Grotesk', sans-serif;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:960px;
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    background:var(--card);
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(26,26,46,0.12);
+    border:1px solid var(--line);
+  }
+
+  .side{
+    background:linear-gradient(160deg,var(--ink) 0%, #2c2f5e 60%, var(--accent) 130%);
+    color:#f0f2f8;
+    padding:48px 36px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    position:relative;
+  }
+  .side::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size:18px 18px;
+    opacity:0.5;
+  }
+  .side h1{
+    font-size:2rem;
+    line-height:1.15;
+    margin:0 0 12px;
+    position:relative;
+  }
+  .side p{
+    font-size:0.92rem;
+    opacity:0.75;
+    line-height:1.5;
+    max-width:32ch;
+    position:relative;
+  }
+  .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    opacity:0.6;
+    position:relative;
+  }
+  .count{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    position:relative;
+  }
+  .count b{
+    display:block;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:2.6rem;
+    font-weight:700;
+    line-height:1;
+    margin-bottom:4px;
+    background:linear-gradient(90deg,#fff,var(--accent2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+
+  .panel{
+    padding:44px 40px;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .toggle{
+    display:flex;
+    gap:4px;
+    background:var(--bg);
+    border-radius:12px;
+    padding:4px;
+    margin-bottom:28px;
+  }
+  .toggle button{
+    flex:1;
+    border:none;
+    background:transparent;
+    padding:10px 0;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:0.88rem;
+    color:#8a8fae;
+    border-radius:9px;
+    cursor:pointer;
+    transition:all .18s ease;
+  }
+  .toggle button.active{
+    background:var(--ink);
+    color:#fff;
+  }
+
+  form{display:none; flex-direction:column; gap:16px;}
+  form.active{display:flex;}
+
+  .admin-link{
+    align-self:flex-start;
+    margin-top:22px;
+    border:none;
+    background:none;
+    color:#8a8fae;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.75rem;
+    letter-spacing:0.04em;
+    cursor:pointer;
+    padding:0;
+  }
+  .admin-link:hover{color:var(--accent);}
+
+  .admin-gate{
+    display:none;
+    flex-direction:column;
+    gap:14px;
+    margin-top:14px;
+    padding:16px;
+    background:var(--bg);
+    border-radius:12px;
+  }
+  .admin-gate.active{display:flex;}
+
+  .admin-only{display:none;}
+  .admin-only.active{display:flex;}
+  .userlist.admin-only.active{display:block;}
+
+  .section-title{
+    font-size:0.8rem;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:#8a8fae;
+    font-family:'IBM Plex Mono', monospace;
+    margin:0 0 4px;
+  }
+
+  label{
+    font-size:0.75rem;
+    font-family:'IBM Plex Mono', monospace;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:#6c7093;
+  }
+  input{
+    margin-top:6px;
+    width:100%;
+    padding:12px 14px;
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:0.95rem;
+    background:#fbfbfe;
+    outline:none;
+    transition:border-color .15s ease;
+  }
+  input:focus{border-color:var(--accent);}
+
+  .field{display:flex; flex-direction:column;}
+
+  button.submit{
+    margin-top:6px;
+    padding:13px;
+    border:none;
+    border-radius:10px;
+    background:var(--ink);
+    color:#fff;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:0.95rem;
+    cursor:pointer;
+    transition:transform .12s ease, background .15s ease;
+  }
+  button.submit:hover{background:var(--accent);}
+  button.submit:active{transform:scale(0.98);}
+  button.submit:focus-visible{outline:2px solid var(--accent2); outline-offset:2px;}
+
+  .msg{
+    min-height:20px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.8rem;
+    margin-top:4px;
+  }
+  .msg.ok{color:#0f9d78;}
+  .msg.err{color:var(--danger);}
+
+  .userlist{
+    margin-top:auto;
+    padding-top:22px;
+    border-top:1px solid var(--line);
+  }
+  .userlist h3{
+    font-size:0.75rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:#8a8fae;
+    font-family:'IBM Plex Mono', monospace;
+    margin:0 0 10px;
+  }
+  .user-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 0;
+    font-size:0.88rem;
+    border-bottom:1px dashed var(--line);
+  }
+  .user-row:last-child{border-bottom:none;}
+  .user-row span.dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--accent2);
+    display:inline-block;
+    margin-right:8px;
+  }
+  .del{
+    border:none;
+    background:none;
+    color:#c7cae2;
+    cursor:pointer;
+    font-size:0.75rem;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .del:hover{color:var(--danger);}
+  .empty{color:#b4b8d6; font-size:0.85rem; font-style:italic;}
+
+  @media (max-width:720px){
+    .wrap{grid-template-columns:1fr;}
+    .side{padding:32px 28px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="side">
+    <div>
+      <span class="tag">Account Portal</span>
+      <h1>Gumawa ng account para sa mga user mo.</h1>
+      <p>Simpleng sistema — username at password lang. Naka-save ito kahit magsara ka ng browser.</p>
+    </div>
+    <div class="count">
+      <b id="userCount">0</b>
+      <span class="tag" style="opacity:1;">rehistradong user</span>
+    </div>
+  </div>
+
+  <div class="panel">
+
+    <form id="formLogin" class="active">
+      <div class="field">
+        <label for="liUser">Username</label>
+        <input id="liUser" autocomplete="off" placeholder="Username mo">
+      </div>
+      <div class="field">
+        <label for="liPass">Password</label>
+        <input id="liPass" type="password" placeholder="Password mo">
+      </div>
+      <button type="submit" class="submit">Mag-login</button>
+      <div class="msg" id="liMsg"></div>
+    </form>
+
+    <button id="adminLink" class="admin-link">Admin access →</button>
+
+    <div id="adminGate" class="admin-gate">
+      <div class="field">
+        <label for="adminUser">Admin username</label>
+        <input id="adminUser" autocomplete="off" placeholder="Admin username">
+      </div>
+      <div class="field">
+        <label for="adminPass">Admin password</label>
+        <input id="adminPass" type="password" placeholder="Admin password">
+      </div>
+      <button type="button" id="adminUnlock" class="submit">Pasok</button>
+      <div class="msg" id="adminMsg"></div>
+    </div>
+
+    <form id="formSignup" class="admin-only">
+      <h3 class="section-title">Gumawa ng Account (Admin)</h3>
+      <div class="field">
+        <label for="suUser">Username</label>
+        <input id="suUser" autocomplete="off" placeholder="hal. juan_delacruz">
+      </div>
+      <div class="field">
+        <label for="suPass">Password</label>
+        <input id="suPass" type="password" placeholder="Mininum 4 characters">
+      </div>
+      <button type="submit" class="submit">Gumawa ng Account</button>
+      <div class="msg" id="suMsg"></div>
+    </form>
+
+    <div class="userlist admin-only">
+      <h3>Mga rehistradong user</h3>
+      <div id="userListBody"><span class="empty">Wala pang naka-register.</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const formSignup = document.getElementById('formSignup');
+  const formLogin = document.getElementById('formLogin');
+  const suMsg = document.getElementById('suMsg');
+  const liMsg = document.getElementById('liMsg');
+  const userListBody = document.getElementById('userListBody');
+  const userCount = document.getElementById('userCount');
+
+  // Ang admin username/password ay naka-store dito bilang SHA-256 hash
+  // (hindi plain text), kaya hindi ito basta mababasa sa source code.
+  // Default credentials: username "hot", password "hot".
+  // Para magpalit: kumuha ng bagong hash (SHA-256 hex) ng gusto mong value
+  // at ipalit sa ADMIN_USER_HASH / ADMIN_PASS_HASH sa ibaba.
+  const ADMIN_USER_HASH = '7f5d1618e7d28cc7bf32788672be04c24877d9a8911f65fef8e3e013c9cbc37';
+  const ADMIN_PASS_HASH = '7f5d1618e7d28cc7bf32788672be04c24877d9a8911f65fef8e3e013c9cbc37';
+
+  async function sha256Hex(text){
+    const enc = new TextEncoder().encode(text);
+    const buf = await crypto.subtle.digest('SHA-256', enc);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  const adminLink = document.getElementById('adminLink');
+  const adminGate = document.getElementById('adminGate');
+  const adminUnlock = document.getElementById('adminUnlock');
+  const adminUser = document.getElementById('adminUser');
+  const adminPass = document.getElementById('adminPass');
+  const adminMsg = document.getElementById('adminMsg');
+  const adminOnlyEls = document.querySelectorAll('.admin-only');
+
+  adminLink.onclick = () => {
+    adminGate.classList.toggle('active');
+  };
+
+  adminUnlock.onclick = async () => {
+    const uHash = await sha256Hex(adminUser.value.trim());
+    const pHash = await sha256Hex(adminPass.value);
+    if(uHash === ADMIN_USER_HASH && pHash === ADMIN_PASS_HASH){
+      adminOnlyEls.forEach(el => el.classList.add('active'));
+      adminGate.classList.remove('active');
+      adminLink.style.display = 'none';
+      loadUsers();
+    } else {
+      adminMsg.textContent = 'Maling admin username o password.';
+      adminMsg.className = 'msg err';
+    }
+  };
+
+  function setMsg(el, text, ok){
+    el.textContent = text;
+    el.className = 'msg ' + (ok ? 'ok' : 'err');
+  }
+
+  async function loadUsers(){
+    try{
+      const list = await window.storage.list('user:', true);
+      const keys = (list && list.keys) ? list.keys : [];
+      userCount.textContent = keys.length;
+      if(keys.length === 0){
+        userListBody.innerHTML = '<span class="empty">Wala pang naka-register.</span>';
+        return;
+      }
+      userListBody.innerHTML = '';
+      for(const key of keys){
+        const uname = key.replace('user:', '');
+        const row = document.createElement('div');
+        row.className = 'user-row';
+        row.innerHTML = `<span><span class="dot"></span>${uname}</span>`;
+        const delBtn = document.createElement('button');
+        delBtn.className = 'del';
+        delBtn.textContent = 'alisin';
+        delBtn.onclick = async () => {
+          try{
+            await window.storage.delete(key, true);
+            loadUsers();
+          }catch(e){ console.error(e); }
+        };
+        row.appendChild(delBtn);
+        userListBody.appendChild(row);
+      }
+    }catch(e){
+      console.error('Load error', e);
+      userListBody.innerHTML = '<span class="empty">Hindi ma-load ang listahan.</span>';
+    }
+  }
+
+  formSignup.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const uname = document.getElementById('suUser').value.trim();
+    const pass = document.getElementById('suPass').value;
+
+    if(!uname || !pass){
+      setMsg(suMsg, 'Kumpletuhin ang username at password.', false);
+      return;
+    }
+    if(pass.length < 4){
+      setMsg(suMsg, 'Dapat 4+ characters ang password.', false);
+      return;
+    }
+
+    try{
+      let exists = null;
+      try{ exists = await window.storage.get('user:' + uname, true); }catch(_){ exists = null; }
+      if(exists){
+        setMsg(suMsg, 'Kuha na ang username na iyan.', false);
+        return;
+      }
+      const result = await window.storage.set('user:' + uname, JSON.stringify({ username: uname, password: pass }), true);
+      if(result){
+        setMsg(suMsg, `Nagawa na ang account ni "${uname}".`, true);
+        document.getElementById('suUser').value = '';
+        document.getElementById('suPass').value = '';
+        loadUsers();
+      } else {
+        setMsg(suMsg, 'Hindi na-save. Subukan ulit.', false);
+      }
+    }catch(err){
+      console.error(err);
+      setMsg(suMsg, 'May error. Subukan ulit.', false);
+    }
+  });
+
+  formLogin.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const uname = document.getElementById('liUser').value.trim();
+    const pass = document.getElementById('liPass').value;
+
+    if(!uname || !pass){
+      setMsg(liMsg, 'Ilagay ang username at password.', false);
+      return;
+    }
+
+    try{
+      const rec = await window.storage.get('user:' + uname, true);
+      if(!rec){
+        setMsg(liMsg, 'Walang account na ganyan.', false);
+        return;
+      }
+      const data = JSON.parse(rec.value);
+      if(data.password === pass){
+        setMsg(liMsg, `Welcome, ${uname}!`, true);
+      } else {
+        setMsg(liMsg, 'Mali ang password.', false);
+      }
+    }catch(err){
+      setMsg(liMsg, 'Walang account na ganyan.', false);
+    }
+  });
+
+  loadUsers();
+</script>
+
+</body>
+</html>
