@@ -511,7 +511,19 @@
         setMsg(liMsg, 'Expired na ang account mo. Makipag-ugnayan sa admin.', false);
         return;
       }
+      // I-save ang session sa localStorage para hindi na mag-login ulit bukas
+      try {
+        localStorage.setItem('vpn_session', JSON.stringify({
+          username: uname,
+          expiresAt: data.expiresAt
+        }));
+      } catch(e) { /* ignore kung blocked ang storage */ }
+
       setMsg(liMsg, `Welcome, ${uname}!`, true);
+
+      // Sabihin sa Android app na tapos na ang login → buksan ang main screen
+      setTimeout(() => notifyAndroid(uname), 600);
+
     }catch(err){
       console.error(err);
       setMsg(liMsg, 'Walang account na ganyan.', false);
@@ -519,6 +531,37 @@
   });
 
   loadUsers();
+
+  // ─── SESSION PERSISTENCE ────────────────────────────────────────────────
+  // Pag-check ng saved session sa localStorage (para hindi mag-login ulit
+  // bawat beses na bubuksan ang app, hanggang hindi pa nag-e-expire ang account)
+  function checkSavedSession() {
+    try {
+      const raw = localStorage.getItem('vpn_session');
+      if (!raw) return;
+      const session = JSON.parse(raw);
+      if (session.expiresAt && Date.now() < session.expiresAt) {
+        // May valid session pa — direkta na sa main screen
+        notifyAndroid(session.username);
+      } else {
+        // Expired na — burahin
+        localStorage.removeItem('vpn_session');
+      }
+    } catch(e) {
+      localStorage.removeItem('vpn_session');
+    }
+  }
+
+  function notifyAndroid(username) {
+    if (window.AndroidBridge) {
+      // Nasa loob ng VPN app — sabihin sa Android na successful ang login
+      window.AndroidBridge.onLoginSuccess(username);
+    }
+    // (Kung nasa browser lang, wala itong epekto — normal na portal lang)
+  }
+
+  // I-check ang session pagload ng page
+  checkSavedSession();
 </script>
 
 </body>
