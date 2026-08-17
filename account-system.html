@@ -322,6 +322,10 @@
         <label for="suPass">Password</label>
         <input id="suPass" type="password" placeholder="Mininum 4 characters">
       </div>
+      <div class="field">
+        <label for="suDays">Valid sa loob ng ilang araw</label>
+        <input id="suDays" type="number" min="1" value="30" placeholder="hal. 30">
+      </div>
       <button type="submit" class="submit">Gumawa ng Account</button>
       <div class="msg" id="suMsg"></div>
     </form>
@@ -418,9 +422,16 @@
       userListBody.innerHTML = '';
       snap.forEach(docSnap => {
         const uname = docSnap.id;
+        const data = docSnap.data();
         const row = document.createElement('div');
         row.className = 'user-row';
-        row.innerHTML = `<span><span class="dot"></span>${uname}</span>`;
+        let expiryLabel = '';
+        if(data.expiresAt){
+          const isExpired = Date.now() > data.expiresAt;
+          const dateStr = new Date(data.expiresAt).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' });
+          expiryLabel = `<small style="display:block;color:${isExpired ? '#e6484f' : '#8a8fae'};font-family:'IBM Plex Mono',monospace;font-size:0.7rem;">${isExpired ? 'Expired noong' : 'Valid hanggang'} ${dateStr}</small>`;
+        }
+        row.innerHTML = `<span><span class="dot"></span>${uname}${expiryLabel}</span>`;
         const delBtn = document.createElement('button');
         delBtn.className = 'del';
         delBtn.textContent = 'alisin';
@@ -443,6 +454,7 @@
     e.preventDefault();
     const uname = document.getElementById('suUser').value.trim();
     const pass = document.getElementById('suPass').value;
+    const days = parseInt(document.getElementById('suDays').value, 10) || 30;
 
     if(!uname || !pass){
       setMsg(suMsg, 'Kumpletuhin ang username at password.', false);
@@ -460,8 +472,10 @@
         setMsg(suMsg, 'Kuha na ang username na iyan.', false);
         return;
       }
-      await setDoc(ref, { username: uname, password: pass });
-      setMsg(suMsg, `Nagawa na ang account ni "${uname}".`, true);
+      const now = Date.now();
+      const expiresAt = now + (days * 24 * 60 * 60 * 1000);
+      await setDoc(ref, { username: uname, password: pass, createdAt: now, expiresAt: expiresAt });
+      setMsg(suMsg, `Nagawa na ang account ni "${uname}", valid sa loob ng ${days} araw.`, true);
       document.getElementById('suUser').value = '';
       document.getElementById('suPass').value = '';
       loadUsers();
@@ -489,11 +503,15 @@
         return;
       }
       const data = snap.data();
-      if(data.password === pass){
-        setMsg(liMsg, `Welcome, ${uname}!`, true);
-      } else {
+      if(data.password !== pass){
         setMsg(liMsg, 'Mali ang password.', false);
+        return;
       }
+      if(data.expiresAt && Date.now() > data.expiresAt){
+        setMsg(liMsg, 'Expired na ang account mo. Makipag-ugnayan sa admin.', false);
+        return;
+      }
+      setMsg(liMsg, `Welcome, ${uname}!`, true);
     }catch(err){
       console.error(err);
       setMsg(liMsg, 'Walang account na ganyan.', false);
