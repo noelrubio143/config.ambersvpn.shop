@@ -333,7 +333,28 @@
   </div>
 </div>
 
-<script>
+<!-- FIREBASE SETUP: palitan ang mga TODO sa ibaba ng config mula sa Firebase Console -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore, doc, setDoc, getDoc, deleteDoc, collection, getDocs
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // TODO: palitan ng config mula sa Firebase Console > Project Settings > Your apps
+  const firebaseConfig = {
+    apiKey: "AIzaSyDvbz3f2biSJ344LgxyM1hA8SguUgtiMKg",
+    authDomain: "ambervpn-c7814.firebaseapp.com",
+    projectId: "ambervpn-c7814",
+    storageBucket: "ambervpn-c7814.firebasestorage.app",
+    messagingSenderId: "735042751832",
+    appId: "1:735042751832:web:4bd0006c42b1d41b31e92d",
+    measurementId: "G-DDE3J1BXZ9"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const usersCol = collection(db, "portal_accounts");
+
   const formSignup = document.getElementById('formSignup');
   const formLogin = document.getElementById('formLogin');
   const suMsg = document.getElementById('suMsg');
@@ -388,16 +409,15 @@
 
   async function loadUsers(){
     try{
-      const list = await window.storage.list('user:', true);
-      const keys = (list && list.keys) ? list.keys : [];
-      userCount.textContent = keys.length;
-      if(keys.length === 0){
+      const snap = await getDocs(usersCol);
+      userCount.textContent = snap.size;
+      if(snap.empty){
         userListBody.innerHTML = '<span class="empty">Wala pang naka-register.</span>';
         return;
       }
       userListBody.innerHTML = '';
-      for(const key of keys){
-        const uname = key.replace('user:', '');
+      snap.forEach(docSnap => {
+        const uname = docSnap.id;
         const row = document.createElement('div');
         row.className = 'user-row';
         row.innerHTML = `<span><span class="dot"></span>${uname}</span>`;
@@ -406,13 +426,13 @@
         delBtn.textContent = 'alisin';
         delBtn.onclick = async () => {
           try{
-            await window.storage.delete(key, true);
+            await deleteDoc(doc(db, 'portal_accounts', uname));
             loadUsers();
           }catch(e){ console.error(e); }
         };
         row.appendChild(delBtn);
         userListBody.appendChild(row);
-      }
+      });
     }catch(e){
       console.error('Load error', e);
       userListBody.innerHTML = '<span class="empty">Hindi ma-load ang listahan.</span>';
@@ -434,21 +454,17 @@
     }
 
     try{
-      let exists = null;
-      try{ exists = await window.storage.get('user:' + uname, true); }catch(_){ exists = null; }
-      if(exists){
+      const ref = doc(db, 'portal_accounts', uname);
+      const existing = await getDoc(ref);
+      if(existing.exists()){
         setMsg(suMsg, 'Kuha na ang username na iyan.', false);
         return;
       }
-      const result = await window.storage.set('user:' + uname, JSON.stringify({ username: uname, password: pass }), true);
-      if(result){
-        setMsg(suMsg, `Nagawa na ang account ni "${uname}".`, true);
-        document.getElementById('suUser').value = '';
-        document.getElementById('suPass').value = '';
-        loadUsers();
-      } else {
-        setMsg(suMsg, 'Hindi na-save. Subukan ulit.', false);
-      }
+      await setDoc(ref, { username: uname, password: pass });
+      setMsg(suMsg, `Nagawa na ang account ni "${uname}".`, true);
+      document.getElementById('suUser').value = '';
+      document.getElementById('suPass').value = '';
+      loadUsers();
     }catch(err){
       console.error(err);
       setMsg(suMsg, 'May error. Subukan ulit.', false);
@@ -466,18 +482,20 @@
     }
 
     try{
-      const rec = await window.storage.get('user:' + uname, true);
-      if(!rec){
+      const ref = doc(db, 'portal_accounts', uname);
+      const snap = await getDoc(ref);
+      if(!snap.exists()){
         setMsg(liMsg, 'Walang account na ganyan.', false);
         return;
       }
-      const data = JSON.parse(rec.value);
+      const data = snap.data();
       if(data.password === pass){
         setMsg(liMsg, `Welcome, ${uname}!`, true);
       } else {
         setMsg(liMsg, 'Mali ang password.', false);
       }
     }catch(err){
+      console.error(err);
       setMsg(liMsg, 'Walang account na ganyan.', false);
     }
   });
